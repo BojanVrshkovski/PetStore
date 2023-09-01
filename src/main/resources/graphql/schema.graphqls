@@ -1,14 +1,24 @@
 type Query {
     users: [User]
+    userById(id : ID!): User
 }
 
+type Mutation{
+    addUser(user: UserInput): User
+}
 
+input UserInput{
+    firstName: String!
+    lastName: String!
+    emailAddress: String!
+    budget: Float!
+}
 
 type User {
     userId: ID!
     firstName: String!
     lastName: String!
-    email: String!
+    emailAddress: String!
     budget: Float!
 }
 

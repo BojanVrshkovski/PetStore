@@ -31,4 +31,14 @@ public class User {
 	@Column(name = "budget", precision = 10, scale = 2, nullable = false)
 	private BigDecimal budget;
 
+	public User(String firstName, String lastName, String emailAddress, BigDecimal budget) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.emailAddress = emailAddress;
+		this.budget = budget;
+	}
+
+	public User() {
+
+	}
 }

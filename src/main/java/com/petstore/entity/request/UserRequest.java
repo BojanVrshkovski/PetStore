@@ -13,4 +13,11 @@ public class UserRequest {
 	private String emailAddress;
 
 	private BigDecimal budget;
+
+	public UserRequest(String firstName, String lastName, String emailAddress, BigDecimal budget) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.emailAddress = emailAddress;
+		this.budget = budget;
+	}
 }

@@ -1,5 +1,7 @@
 package com.petstore.service;
 
-public interface UserService {
+import com.petstore.entity.User;
 
+public interface UserService {
+	User getUserById(Long userId);
 }

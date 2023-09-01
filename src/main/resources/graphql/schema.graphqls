@@ -1,6 +1,5 @@
 type Query {
-    users: [User]
-    userById(id : ID!): User
+    readUserById(id : ID!): User
 }
 
 type Mutation{

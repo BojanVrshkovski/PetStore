@@ -1,4 +1,5 @@
 type Query {
+    readAllUsers: [UserDto]
     readUserById(id : ID!): User
 }
 
@@ -14,6 +15,14 @@ input UserInput{
 }
 
 type User {
+    userId: ID!
+    firstName: String!
+    lastName: String!
+    emailAddress: String!
+    budget: Float!
+}
+
+type UserDto {
     userId: ID!
     firstName: String!
     lastName: String!

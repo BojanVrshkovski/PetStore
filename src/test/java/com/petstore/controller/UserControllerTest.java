@@ -1,7 +1,7 @@
 package com.petstore.controller;
 
-import com.petstore.entity.User;
-import com.petstore.exception.UserNotFoundException;
+import com.petstore.entity.dto.UserDto;
+import com.petstore.exception.NoUsersFoundException;
 import com.petstore.service.UserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -21,28 +23,25 @@ public class UserControllerTest {
 	private UserService userService;
 
 	@Test
-	public void testGetUserByIdSuccess() {
-		Long userId = 1L;
-		User expectedUser = new User(userId,"Bojan","Vrshkovski","bojan@gmail.com",new BigDecimal(200.2));
+	public void testReadAllUsersSuccess() {
 
-		when(userService.getUserById(userId)).thenReturn(expectedUser);
+		List<UserDto> expectedUsers = Arrays.asList(
+			new UserDto(2L,"Bojan","Vrshkovski","b@gmail.com",new BigDecimal(123.22)),
+			new UserDto(3L,"Petar","Vrshkovski","petar@gmail.com",new BigDecimal(12322.22))
+		);
 
-		User result = userController.userById(userId);
+		when(userService.readAllUsers()).thenReturn(expectedUsers);
+
+		List<UserDto> result = userController.readAllUsers();
 
 		assertNotNull(result);
-		assertEquals(userId, result.getUserId());
-		assertEquals("Bojan", result.getFirstName());
-		assertEquals("Vrshkovski", result.getLastName());
-		assertEquals("bojan@gmail.com", result.getEmailAddress());
-		assertEquals(new BigDecimal(200.2), result.getBudget());
+		assertEquals(expectedUsers.size(), result.size());
 	}
 
 	@Test
-	public void testGetUserByIdNotFound() {
-		Long userId = 2L;
+	public void testReadAllUsersFailure() {
+		when(userService.readAllUsers()).thenThrow(NoUsersFoundException.class);
 
-		when(userService.getUserById(userId)).thenThrow(UserNotFoundException.class);
-
-		assertThrows(UserNotFoundException.class, () -> userController.userById(userId));
+		assertThrows(NoUsersFoundException.class, () -> userController.readAllUsers());
 	}
 }

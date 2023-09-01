@@ -19,7 +19,7 @@ public class UserController {
 	public UserController( UserService userService) {
 		this.userService = userService;
 	}
-	
+
 	@QueryMapping
 	User userById(@Argument Long id){
 		return userService.getUserById(id);

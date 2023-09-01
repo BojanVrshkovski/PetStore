@@ -1,6 +1,8 @@
 package com.petstore.controller;
 
+import com.petstore.entity.User;
 import com.petstore.entity.dto.UserDto;
+import com.petstore.entity.request.UserRequest;
 import com.petstore.exception.NoUsersFoundException;
 import com.petstore.exception.UserNotFoundException;
 import com.petstore.service.UserService;
@@ -9,6 +11,9 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.dao.DataIntegrityViolationException;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -72,4 +77,50 @@ public class UserControllerTest {
 		assertThrows(NoUsersFoundException.class, () -> userController.readAllUsers());
 	}
 
+	@Test
+	public void testCreateUserSuccess() {
+		UserRequest userRequest = new UserRequest();
+		userRequest.setFirstName("Bojan");
+		userRequest.setLastName("Vrshkovski");
+		userRequest.setEmailAddress("bojan@gmail.com");
+		userRequest.setBudget(new BigDecimal(100.0));
+
+		User createdUser = new User();
+		createdUser.setUserId(1L);
+		createdUser.setFirstName("Bojan");
+		createdUser.setLastName("Vrshkovski");
+		createdUser.setEmailAddress("bojan@gmail.com");
+		createdUser.setBudget(new BigDecimal(100.0));
+
+		when(userService.createUser(userRequest)).thenReturn(createdUser);
+
+		User result = userController.createUser(userRequest);
+
+		assertNotNull(result);
+		assertEquals(1L, result.getUserId().longValue());
+		assertEquals("Bojan", result.getFirstName());
+		assertEquals("Vrshkovski", result.getLastName());
+		assertEquals("bojan@gmail.com", result.getEmailAddress());
+		assertEquals(new BigDecimal(100.0), result.getBudget());
+	}
+
+	@Test
+	public void testCreateUserFailure() {
+		UserRequest userRequest = new UserRequest();
+		userRequest.setFirstName("Bojan");
+		userRequest.setLastName("Vrshkovski");
+		userRequest.setEmailAddress("bojan@gmail.com");
+		userRequest.setBudget(new BigDecimal(100.0));
+
+		when(userService.createUser(userRequest)).thenThrow(new DataIntegrityViolationException("User with that email already exists"));
+
+		try {
+			userController.createUser(userRequest);
+			fail("Expected exception was not thrown");
+		} catch (Exception ex) {
+			assertEquals("User with that email already exists", ex.getMessage());
+		}
+
+		verify(userService, times(1)).createUser(userRequest);
+	}
 }

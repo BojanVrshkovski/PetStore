@@ -2,6 +2,8 @@ package com.petstore.service.impl;
 
 import com.petstore.entity.User;
 import com.petstore.entity.dto.UserDto;
+import com.petstore.entity.request.UserRequest;
+import com.petstore.exception.UserAlreadyExistException;
 import com.petstore.exception.UserNotFoundException;
 import com.petstore.exception.NoUsersFoundException;
 import com.petstore.repository.UserRepository;
@@ -14,6 +16,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
+import static org.mockito.Mockito.doThrow;
 import java.math.BigDecimal;
 import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
@@ -113,5 +117,49 @@ public class UserServiceImplTest {
 		when(userRepository.findAll()).thenReturn(Collections.emptyList());
 
 		assertThrows(NoUsersFoundException.class, () -> userService.readAllUsers());
+	}
+
+	@Test
+	public void testCreateUserSuccess() {
+		UserRequest userRequest= new UserRequest( "Bojan", "Vrshkovski", "bojan@gmail.com", new BigDecimal("1000.0"));
+		User userEntity = new User();
+		userEntity.setUserId(1L);
+		userEntity.setFirstName("Bojan");
+		userEntity.setLastName("Vrshkovski");
+		userEntity.setEmailAddress("bojan@gmail.com");
+		userEntity.setBudget(new BigDecimal("1000.0"));
+
+		when(modelMapper.map(userRequest, User.class)).thenReturn(userEntity);
+		when(userRepository.save(userEntity)).thenReturn(userEntity);
+
+		User result = userService.createUser(userRequest);
+
+		assertNotNull(result);
+		assertEquals(1L, result.getUserId());
+		assertEquals("Bojan", result.getFirstName());
+		assertEquals("Vrshkovski", result.getLastName());
+		assertEquals("bojan@gmail.com", result.getEmailAddress());
+		assertEquals(new BigDecimal("1000.0"), result.getBudget());
+	}
+
+	@Test
+	public void testCreateUserAlreadyExists() {
+		UserRequest userRequest= new UserRequest( "Bojan", "Vrshkovski", "bojan@gmail.com", new BigDecimal("1000.0"));
+		User userEntity = new User();
+		userEntity.setUserId(1L);
+		userEntity.setFirstName("Bojan");
+		userEntity.setLastName("Vrshkovski");
+		userEntity.setEmailAddress("bojan@gmail.com");
+		userEntity.setBudget(new BigDecimal("1000.0"));
+
+		when(modelMapper.map(userRequest, User.class)).thenReturn(userEntity);
+		doThrow(DataIntegrityViolationException.class).when(userRepository).save(userEntity);
+
+		assertThrows(UserAlreadyExistException.class, () -> userService.createUser(userRequest));
+	}
+
+	@Test
+	public void testCreateUserNullInput() {
+		assertThrows(IllegalArgumentException.class, () -> userService.createUser(null));
 	}
 }

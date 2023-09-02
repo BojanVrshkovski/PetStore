@@ -43,4 +43,20 @@ public class Pet {
 
 	@Column(name = "rating")
 	private Integer rating;
+
+	public Pet() {
+	}
+
+	public Pet(
+		Long petId, Long owner, String name, PetType petType, String description, LocalDate dateOfBirth, BigDecimal price,
+		Integer rating) {
+		this.petId = petId;
+		this.owner = owner;
+		this.name = name;
+		this.petType = petType;
+		this.description = description;
+		this.dateOfBirth = dateOfBirth;
+		this.price = price;
+		this.rating = rating;
+	}
 }

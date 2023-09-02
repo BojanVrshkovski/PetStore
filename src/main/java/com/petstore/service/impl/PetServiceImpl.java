@@ -3,6 +3,7 @@ package com.petstore.service.impl;
 import com.petstore.entity.Pet;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
+import com.petstore.exception.PetAlredyExistsException;
 import com.petstore.exception.UserAlreadyExistException;
 import com.petstore.repository.PetRepository;
 import com.petstore.service.PetService;
@@ -57,7 +58,7 @@ public class PetServiceImpl implements PetService {
 			log.info(String.format("Pet successfully added in database with name: %s",petRequest.getName()));
 		}catch (DataIntegrityViolationException e){
 			log.error(String.format("The pet alredy exists"));
-			throw new UserAlreadyExistException("The pet alredy exists");
+			throw new PetAlredyExistsException("The pet alredy exists");
 		}
 		return pet;
 	}

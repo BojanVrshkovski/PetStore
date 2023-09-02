@@ -4,6 +4,7 @@ import com.petstore.entity.Pet;
 import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
+import com.petstore.exception.NoUsersFoundException;
 import com.petstore.exception.PetAlredyExistsException;
 import com.petstore.repository.PetRepository;
 import com.petstore.service.PetService;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PetServiceImpl implements PetService {
@@ -66,6 +68,14 @@ public class PetServiceImpl implements PetService {
 
 	@Override
 	public List<PetDto> readAllPets() {
-		return null;
+		List<Pet> pets = petRepository.findAll();
+		if (pets.isEmpty()) {
+			log.error(String.format("No pets found"));
+			throw new NoUsersFoundException("No pets found");
+		}
+		log.info(String.format("Retriving all the pets"));
+		return pets.stream()
+		            .map(pet -> modelMapper.map(pet, PetDto.class))
+		            .collect(Collectors.toList());
 	}
 }

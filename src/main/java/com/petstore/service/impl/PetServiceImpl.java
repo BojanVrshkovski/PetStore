@@ -4,6 +4,7 @@ import com.petstore.entity.Pet;
 import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
+import com.petstore.exception.NoPetsFoundException;
 import com.petstore.exception.NoUsersFoundException;
 import com.petstore.exception.PetAlredyExistsException;
 import com.petstore.repository.PetRepository;
@@ -71,7 +72,7 @@ public class PetServiceImpl implements PetService {
 		List<Pet> pets = petRepository.findAll();
 		if (pets.isEmpty()) {
 			log.error(String.format("No pets found"));
-			throw new NoUsersFoundException("No pets found");
+			throw new NoPetsFoundException("No pets found");
 		}
 		log.info(String.format("Retriving all the pets"));
 		return pets.stream()

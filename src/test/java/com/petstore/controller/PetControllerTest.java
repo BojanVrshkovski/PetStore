@@ -1,8 +1,11 @@
 package com.petstore.controller;
 
 import com.petstore.entity.Pet;
+import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
+import com.petstore.exception.NoPetsFoundException;
+import com.petstore.exception.NoUsersFoundException;
 import com.petstore.service.PetService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,8 +15,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.DataIntegrityViolationException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -82,5 +88,28 @@ public class PetControllerTest {
 		}
 
 		verify(petService, times(1)).createPet(petRequest);
+	}
+
+	@Test
+	public void testReadAllPetsSuccess() {
+
+		List<PetDto> expectedPets = Arrays.asList(
+			new PetDto(2L,1L,"Toffi",PetType.CAT,"The best cat",LocalDate.of(2018,02,02),new BigDecimal(123.22),5),
+			new PetDto(3L,2L,"Buffi",PetType.DOG,"The best cat",LocalDate.of(2019,04,10),new BigDecimal(100.20),3)
+		);
+
+		when(petService.readAllPets()).thenReturn(expectedPets);
+
+		List<PetDto> result = petController.readAllPets();
+
+		assertNotNull(result);
+		assertEquals(expectedPets.size(), result.size());
+	}
+
+	@Test
+	public void testReadAllPetsFailure() {
+		when(petService.readAllPets()).thenThrow(NoPetsFoundException.class);
+
+		assertThrows(NoPetsFoundException.class, () -> petController.readAllPets());
 	}
 }

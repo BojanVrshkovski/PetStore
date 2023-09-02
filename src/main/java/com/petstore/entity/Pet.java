@@ -25,9 +25,8 @@ public class Pet {
 	@Column(name = "pet_id")
 	private Long petId;
 
-	@OneToOne
-	@JoinColumn(name = "owner_id", referencedColumnName = "user_id")
-	private User owner;
+	@Column(name = "owner_id")
+	private Long owner;
 
 	@Column(name = "name", length = 50, nullable = false)
 	private String name;

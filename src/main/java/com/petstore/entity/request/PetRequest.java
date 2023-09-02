@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Data
 public class PetRequest {
-	private User owner;
+	private Long owner;
 
 	private String name;
 
@@ -27,7 +27,7 @@ public class PetRequest {
 	}
 
 	public PetRequest(
-		User owner, String name, PetType petType, String description, LocalDate dateOfBirth, BigDecimal price,
+		Long owner, String name, PetType petType, String description, LocalDate dateOfBirth, BigDecimal price,
 		Integer rating) {
 		this.owner = owner;
 		this.name = name;

@@ -9,7 +9,6 @@ type Mutation{
 }
 
 input UserInput{
-    userId: ID
     firstName: String!
     lastName: String!
     emailAddress: String!
@@ -17,7 +16,7 @@ input UserInput{
 }
 
 input PetInput {
-    owner: UserInput!
+    owner: Int!
     name: String!
     petType: String!
     description: String

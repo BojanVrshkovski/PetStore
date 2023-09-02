@@ -9,7 +9,8 @@ import java.time.LocalDate;
 
 @Data
 public class PetDto {
-	private User owner;
+	private Long petId;
+	private Long owner;
 
 	private String name;
 

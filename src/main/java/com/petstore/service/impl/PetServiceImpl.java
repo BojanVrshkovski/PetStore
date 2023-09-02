@@ -4,7 +4,6 @@ import com.petstore.entity.Pet;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.exception.PetAlredyExistsException;
-import com.petstore.exception.UserAlreadyExistException;
 import com.petstore.repository.PetRepository;
 import com.petstore.service.PetService;
 import org.modelmapper.ModelMapper;

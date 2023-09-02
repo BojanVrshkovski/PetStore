@@ -1,6 +1,7 @@
 type Query {
     readAllUsers: [UserDto]
     readUserById(id : ID!): User
+    readAllPets: [PetDto]
 }
 
 type Mutation{
@@ -42,6 +43,17 @@ type UserDto {
 }
 
 type Pet {
+    petId: ID!
+    owner: User!
+    name: String!
+    petType: String!
+    description: String
+    dateOfBirth: String!
+    price: Float!
+    rating: Int
+}
+
+type PetDto {
     petId: ID!
     owner: User!
     name: String!

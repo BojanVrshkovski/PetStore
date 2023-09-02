@@ -1,6 +1,7 @@
 package com.petstore.service.impl;
 
 import com.petstore.entity.Pet;
+import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.exception.PetAlredyExistsException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 public class PetServiceImpl implements PetService {
@@ -60,5 +62,10 @@ public class PetServiceImpl implements PetService {
 			throw new PetAlredyExistsException("The pet alredy exists");
 		}
 		return pet;
+	}
+
+	@Override
+	public List<PetDto> readAllPets() {
+		return null;
 	}
 }

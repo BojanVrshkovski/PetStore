@@ -8,10 +8,21 @@ type Mutation{
 }
 
 input UserInput{
+    userId: ID
     firstName: String!
     lastName: String!
     emailAddress: String!
     budget: Float!
+}
+
+input PetInput {
+    owner: UserInput!
+    name: String!
+    petType: String!
+    description: String
+    dateOfBirth: String!
+    price: Float!
+    rating: Int
 }
 
 type User {

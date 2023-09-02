@@ -22,4 +22,19 @@ public class PetRequest {
 	private BigDecimal price;
 
 	private Integer rating;
+
+	public PetRequest() {
+	}
+
+	public PetRequest(
+		User owner, String name, PetType petType, String description, LocalDate dateOfBirth, BigDecimal price,
+		Integer rating) {
+		this.owner = owner;
+		this.name = name;
+		this.petType = petType;
+		this.description = description;
+		this.dateOfBirth = dateOfBirth;
+		this.price = price;
+		this.rating = rating;
+	}
 }

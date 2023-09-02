@@ -5,6 +5,7 @@ type Query {
 
 type Mutation{
     createUser(userRequest: UserInput): User
+    createPet(petRequest: PetInput): Pet
 }
 
 input UserInput{

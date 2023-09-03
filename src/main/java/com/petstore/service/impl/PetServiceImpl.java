@@ -90,6 +90,7 @@ public class PetServiceImpl implements PetService {
 		Optional<Pet> petOptional = petRepository.findById(petId);
 
 		if (userOptional.isEmpty() || petOptional.isEmpty()) {
+			log.error(String.format("User or pet not found"));
 			return false;
 		}
 
@@ -97,6 +98,7 @@ public class PetServiceImpl implements PetService {
 		Pet pet = petOptional.get();
 
 		if (pet.getOwner() != null) {
+			log.error(String.format("Pet already has an owner"));
 			return false;
 		}
 
@@ -112,13 +114,16 @@ public class PetServiceImpl implements PetService {
 			petRepository.save(pet);
 
 			if (pet.getPetType() == PetType.CAT) {
+				log.info(String.format("The cat is successfully bought"));
 				System.out.println("Meow, cat " + pet.getName() + " has owner " + user.getFirstName());
 			} else if (pet.getPetType() == PetType.DOG) {
+				log.info(String.format("The dog is successfully bought"));
 				System.out.println("Woof, dog " + pet.getName() + " has owner " + user.getFirstName());
 			}
 
 			return true;
 		} else {
+			log.error(String.format("The user with name %s has not enough budget"),user.getFirstName());
 			return false;
 		}
 	}

@@ -2,9 +2,12 @@ package com.petstore.controller;
 
 import com.petstore.entity.Pet;
 import com.petstore.entity.dto.PetDto;
+import com.petstore.entity.dto.UserDto;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.exception.NoPetsFoundException;
+import com.petstore.exception.PetNotFoundException;
+import com.petstore.exception.UserNotFoundException;
 import com.petstore.service.PetService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -110,6 +113,33 @@ public class PetControllerTest {
 		when(petService.readAllPets()).thenThrow(NoPetsFoundException.class);
 
 		assertThrows(NoPetsFoundException.class, () -> petController.readAllPets());
+	}
+
+	public void testReadPetByIdSuccess() {
+		Long petId = 1L;
+		PetDto expectedPet = new PetDto(petId, 1L,"Toffi",PetType.CAT,"The best cat",LocalDate.of(2018,02,02),new BigDecimal(123.22),5);
+
+		when(petService.readPetById(petId)).thenReturn(expectedPet);
+
+		PetDto result = petController.readPetById(petId);
+
+		assertNotNull(result);
+		assertEquals(petId, result.getPetId());
+		assertEquals(1L, result.getOwner());
+		assertEquals("Toffi", result.getName());
+		assertEquals(PetType.CAT, result.getPetType());
+		assertEquals(LocalDate.of(2018,02,02), result.getDateOfBirth());
+		assertEquals(new BigDecimal(123.22), result.getPrice());
+		assertEquals(5, result.getRating());
+	}
+
+	@Test
+	public void testReadPetByIdNotFound() {
+		Long petId = 2L;
+
+		when(petService.readPetById(petId)).thenThrow(PetNotFoundException.class);
+
+		assertThrows(PetNotFoundException.class, () -> petController.readPetById(petId));
 	}
 
 }

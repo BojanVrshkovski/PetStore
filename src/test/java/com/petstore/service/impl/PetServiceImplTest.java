@@ -3,12 +3,15 @@ package com.petstore.service.impl;
 import com.petstore.entity.Pet;
 import com.petstore.entity.User;
 import com.petstore.entity.dto.PetDto;
+import com.petstore.entity.dto.UserDto;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.exception.NoPetsFoundException;
 import com.petstore.exception.NotEnoughBudgetException;
 import com.petstore.exception.PetAlredyExistsException;
 import com.petstore.exception.PetAlredyHasOwnerException;
+import com.petstore.exception.PetNotFoundException;
+import com.petstore.exception.UserNotFoundException;
 import com.petstore.repository.PetRepository;
 import com.petstore.repository.UserRepository;
 import org.junit.Test;
@@ -16,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
@@ -220,5 +224,41 @@ public class PetServiceImplTest {
 		assertThrows(NotEnoughBudgetException.class, () -> petService.buy(userId, petId));
 
 		verify(petRepository, times(1)).findById(petId);
+	}
+
+	@Test
+	public void testReadPetByIdSuccess() {
+		Long petId = 1L;
+		Pet expectedPet = new Pet(petId, 1L,"Toffi",PetType.CAT,"The best cat",LocalDate.of(2018,02,02),new BigDecimal(123.22),5);
+
+		when(modelMapper.map(expectedPet, PetDto.class)).thenReturn(new PetDto(petId, 1L,"Toffi",PetType.CAT,"The best cat",LocalDate.of(2018,02,02),new BigDecimal(123.22),5));
+
+		when(petRepository.findById(petId)).thenReturn(Optional.of(expectedPet));
+
+		PetDto result = petService.readPetById(petId);
+
+		assertNotNull(result);
+		assertEquals(petId, result.getPetId());
+		assertEquals(1L, result.getOwner());
+		assertEquals("Toffi", result.getName());
+		assertEquals(PetType.CAT, result.getPetType());
+		assertEquals(LocalDate.of(2018,02,02), result.getDateOfBirth());
+		assertEquals(new BigDecimal(123.22), result.getPrice());
+		assertEquals(5, result.getRating());
+	}
+
+	@Test
+	public void testGetUserByIdUserNotFound() {
+		Long petId = 999L;
+		when(petRepository.findById(petId)).thenReturn(Optional.empty());
+
+		assertThrows(PetNotFoundException.class, () -> petService.readPetById(petId));
+	}
+
+	@Test
+	public void testGetUserByIdNullUserId() {
+		Long petId = null;
+
+		assertThrows(PetNotFoundException.class, () -> petService.readPetById(petId));
 	}
 }

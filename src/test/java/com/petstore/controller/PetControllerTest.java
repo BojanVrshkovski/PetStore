@@ -1,6 +1,7 @@
 package com.petstore.controller;
 
 import com.petstore.entity.Pet;
+import com.petstore.entity.User;
 import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.dto.UserDto;
 import com.petstore.entity.enums.PetType;
@@ -9,6 +10,7 @@ import com.petstore.exception.NoPetsFoundException;
 import com.petstore.exception.PetNotFoundException;
 import com.petstore.exception.UserNotFoundException;
 import com.petstore.service.PetService;
+import com.petstore.service.UserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -19,7 +21,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.never;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -34,6 +38,8 @@ public class PetControllerTest {
 
 	@Mock
 	private PetService petService;
+	@Mock
+	private UserService userService;
 
 	@Test
 	public void testCreatePetSuccess() {
@@ -113,6 +119,35 @@ public class PetControllerTest {
 		when(petService.readAllPets()).thenThrow(NoPetsFoundException.class);
 
 		assertThrows(NoPetsFoundException.class, () -> petController.readAllPets());
+	}
+
+	@Test
+	public void testBuyPetSuccess() {
+		Long userId = 1L;
+		Long petId = 2L;
+		User testUser = new User();
+		testUser.setBudget(new BigDecimal(1000));
+
+		UserDto testUserDto = new UserDto();
+		testUserDto.setBudget(new BigDecimal(1000));
+
+		Pet testPet = new Pet();
+		testPet.setPrice(new BigDecimal(500));
+		testPet.setOwner(null);
+
+		PetDto testPetDto = new PetDto();
+		testPetDto.setPrice(new BigDecimal(500));
+		testPetDto.setOwner(null);
+
+		when(petService.buy(userId, petId)).thenReturn(testPet);
+		when(petService.readPetById(petId)).thenReturn(testPetDto);
+		when(userService.readUserById(userId)).thenReturn(testUserDto);
+
+		Pet result = petController.buy(userId, petId);
+
+		assertNotNull(result);
+
+		verify(petService, times(1)).buy(userId, petId);
 	}
 
 	public void testReadPetByIdSuccess() {

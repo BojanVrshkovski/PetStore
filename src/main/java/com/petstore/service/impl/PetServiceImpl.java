@@ -97,7 +97,7 @@ public class PetServiceImpl implements PetService {
 			throw new UserNotFoundException();
 		}else if (petOptional.isEmpty()){
 			log.error(String.format("Pet not found"));
-			throw new NoPetsFoundException("The pet you provided is not found");
+			throw new PetNotFoundException();
 		}
 
 		User user = userOptional.get();

@@ -164,10 +164,10 @@ public class PetServiceImplTest {
 		when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
 		when(petRepository.findById(petId)).thenReturn(Optional.of(testPet));
 
-		boolean result = petService.buy(userId, petId);
+		Pet result = petService.buy(userId, petId);
 		testPet.setOwner(userId);
 
-		assertTrue(result);
+		assertNotNull(result);
 
 		assertEquals(new BigDecimal(500), testUser.getBudget());
 		assertEquals(userId, testPet.getOwner());

@@ -88,7 +88,7 @@ public class PetServiceImpl implements PetService {
 	}
 
 	@Override
-	public Boolean buy(Long userId, Long petId) {
+	public Pet buy(Long userId, Long petId) {
 		Optional<User> userOptional = userRepository.findById(userId);
 		Optional<Pet> petOptional = petRepository.findById(petId);
 
@@ -132,6 +132,6 @@ public class PetServiceImpl implements PetService {
 		}
 
 		log.info(String.format("Purchase successful"));
-		return true;
+		return pet;
 	}
 }

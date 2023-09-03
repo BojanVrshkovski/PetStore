@@ -32,7 +32,7 @@ public class PetController {
 	}
 
 	@MutationMapping
-	public Boolean buy(@Argument Long userId,@Argument Long petId){
+	public Pet buy(@Argument Long userId,@Argument Long petId){
 		return petService.buy(userId,petId);
 	}
 }

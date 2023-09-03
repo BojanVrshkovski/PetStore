@@ -30,4 +30,9 @@ public class PetController {
 	public List<PetDto> readAllPets(){
 		return petService.readAllPets();
 	}
+
+	@MutationMapping
+	public Boolean buy(@Argument Long userId,@Argument Long petId){
+		return petService.buy(userId,petId);
+	}
 }

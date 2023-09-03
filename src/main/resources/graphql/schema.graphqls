@@ -7,6 +7,7 @@ type Query {
 type Mutation{
     createUser(userRequest: UserInput): User
     createPet(petRequest: PetInput): Pet
+    buy(userId: ID!, petId: ID!): Boolean
 }
 
 input UserInput{
@@ -17,12 +18,11 @@ input UserInput{
 }
 
 input PetInput {
-    owner: Int!
+    owner: Int
     name: String!
     petType: String!
     description: String
     dateOfBirth: String!
-    price: Float!
     rating: Int
 }
 

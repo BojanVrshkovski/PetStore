@@ -6,7 +6,10 @@ import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.exception.NoPetsFoundException;
+import com.petstore.exception.NotEnoughBudgetException;
 import com.petstore.exception.PetAlredyExistsException;
+import com.petstore.exception.PetAlredyHasOwnerException;
+import com.petstore.exception.UserNotFoundException;
 import com.petstore.repository.PetRepository;
 import com.petstore.repository.UserRepository;
 import com.petstore.service.PetService;
@@ -20,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -88,9 +92,12 @@ public class PetServiceImpl implements PetService {
 		Optional<User> userOptional = userRepository.findById(userId);
 		Optional<Pet> petOptional = petRepository.findById(petId);
 
-		if (userOptional.isEmpty() || petOptional.isEmpty()) {
-			log.error(String.format("User or pet not found"));
-			return false;
+		if (userOptional.isEmpty()) {
+			log.error(String.format("The user you provided is not found"));
+			throw new UserNotFoundException();
+		}else if (petOptional.isEmpty()){
+			log.error(String.format("Pet not found"));
+			throw new NoPetsFoundException("The pet you provided is not found");
 		}
 
 		User user = userOptional.get();
@@ -98,7 +105,7 @@ public class PetServiceImpl implements PetService {
 
 		if (pet.getOwner() != null) {
 			log.error(String.format("Pet already has an owner"));
-			return false;
+			throw new PetAlredyHasOwnerException("Pet already has an owner");
 		}
 
 		BigDecimal userBudget = user.getBudget();
@@ -123,7 +130,7 @@ public class PetServiceImpl implements PetService {
 			return true;
 		} else {
 			log.error(String.format("The user with name %s has not enough budget",user.getFirstName()));
-			return false;
+			throw new NotEnoughBudgetException("The user with name " + user.getFirstName() + " has not enough budget");
 		}
 	}
 }

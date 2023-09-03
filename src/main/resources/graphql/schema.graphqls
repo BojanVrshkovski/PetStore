@@ -2,6 +2,7 @@ type Query {
     readAllUsers: [UserDto]
     readUserById(id : ID!): User
     readAllPets: [PetDto]
+    readPetById(petId: ID!): Pet
 }
 
 type Mutation{

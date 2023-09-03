@@ -10,4 +10,5 @@ public interface PetService {
 	Pet createPet(PetRequest petRequest);
 	List<PetDto> readAllPets();
 	Pet buy(Long userId,Long petId);
+	PetDto readPetById(Long petId);
 }

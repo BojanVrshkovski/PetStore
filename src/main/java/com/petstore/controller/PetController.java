@@ -35,4 +35,8 @@ public class PetController {
 	public Pet buy(@Argument Long userId,@Argument Long petId){
 		return petService.buy(userId,petId);
 	}
+	@QueryMapping
+	public PetDto readPetById(@Argument Long petId) {
+		return petService.readPetById(petId);
+	}
 }

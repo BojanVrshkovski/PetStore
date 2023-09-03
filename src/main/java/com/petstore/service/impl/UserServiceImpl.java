@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDto readUserById(Long userId) {
-		log.info(String.format("Use with id: %d is being fetched", userId));
+		log.info(String.format("User with id: %d is being fetched", userId));
 		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 		return modelMapper.map(user,UserDto.class);
 	}

@@ -9,6 +9,7 @@ import com.petstore.exception.NoPetsFoundException;
 import com.petstore.exception.NotEnoughBudgetException;
 import com.petstore.exception.PetAlredyExistsException;
 import com.petstore.exception.PetAlredyHasOwnerException;
+import com.petstore.exception.PetNotFoundException;
 import com.petstore.exception.UserNotFoundException;
 import com.petstore.repository.PetRepository;
 import com.petstore.repository.UserRepository;
@@ -23,7 +24,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -133,5 +133,12 @@ public class PetServiceImpl implements PetService {
 
 		log.info(String.format("Purchase successful"));
 		return pet;
+	}
+
+	@Override
+	public PetDto readPetById(Long petId) {
+		log.info(String.format("Pet with id: %d is being fetched", petId));
+		Pet pet = petRepository.findById(petId).orElseThrow(PetNotFoundException::new);
+		return modelMapper.map(pet, PetDto.class);
 	}
 }

@@ -115,7 +115,7 @@ public class PetServiceImpl implements PetService {
 			log.error(String.format("The user with name %s has not enough budget",user.getFirstName()));
 			throw new NotEnoughBudgetException("Not enough budget");
 		}
-		
+
 		user.setBudget(userBudget.subtract(petPrice));
 
 		pet.setOwner(user.getUserId());

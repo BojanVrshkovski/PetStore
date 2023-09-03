@@ -5,7 +5,6 @@ import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.exception.NoPetsFoundException;
-import com.petstore.exception.NoUsersFoundException;
 import com.petstore.service.PetService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -112,4 +111,5 @@ public class PetControllerTest {
 
 		assertThrows(NoPetsFoundException.class, () -> petController.readAllPets());
 	}
+
 }

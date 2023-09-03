@@ -1,12 +1,16 @@
 package com.petstore.service.impl;
 
 import com.petstore.entity.Pet;
+import com.petstore.entity.User;
 import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.exception.NoPetsFoundException;
+import com.petstore.exception.NotEnoughBudgetException;
 import com.petstore.exception.PetAlredyExistsException;
+import com.petstore.exception.PetAlredyHasOwnerException;
 import com.petstore.repository.PetRepository;
+import com.petstore.repository.UserRepository;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
@@ -15,11 +19,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
+import static org.mockito.Mockito.verify;
 import org.springframework.dao.DataIntegrityViolationException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,6 +46,8 @@ public class PetServiceImplTest {
 
 	@Mock
 	private PetRepository petRepository;
+	@Mock
+	private UserRepository userRepository;
 
 	@BeforeEach
 	public void init() {
@@ -139,5 +149,76 @@ public class PetServiceImplTest {
 		when(petRepository.findAll()).thenReturn(Collections.emptyList());
 
 		assertThrows(NoPetsFoundException.class, () -> petService.readAllPets());
+	}
+
+	@Test
+	public void testBuyPetSuccess() {
+		Long userId = 1L;
+		Long petId = 2L;
+		User testUser = new User();
+		testUser.setBudget(new BigDecimal(1000));
+		Pet testPet = new Pet();
+		testPet.setPrice(new BigDecimal(500));
+		testPet.setOwner(null);
+
+		when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+		when(petRepository.findById(petId)).thenReturn(Optional.of(testPet));
+
+		boolean result = petService.buy(userId, petId);
+		testPet.setOwner(userId);
+
+		assertTrue(result);
+
+		assertEquals(new BigDecimal(500), testUser.getBudget());
+		assertEquals(userId, testPet.getOwner());
+
+		verify(userRepository, times(1)).save(testUser);
+		verify(petRepository, times(1)).save(testPet);
+	}
+
+	@Test
+	public void testBuyPetPetNotFound() {
+		Long userId = 1L;
+		Long petId = 2L;
+		User testUser = new User();
+		when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+		when(petRepository.findById(petId)).thenReturn(Optional.empty());
+
+		assertThrows(NoPetsFoundException.class, () -> petService.buy(userId, petId));
+
+		verify(userRepository, times(1)).findById(userId);
+	}
+
+	@Test
+	public void testBuyPetAlreadyHasOwner() {
+		Long userId = 1L;
+		Long petId = 2L;
+		User testUser = new User();
+		Pet testPet = new Pet();
+		testPet.setOwner(3L);
+
+		when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+		when(petRepository.findById(petId)).thenReturn(Optional.of(testPet));
+
+		assertThrows(PetAlredyHasOwnerException.class, () -> petService.buy(userId, petId));
+
+		verify(userRepository, times(1)).findById(userId);
+	}
+
+	@Test
+	public void testBuyPetNotEnoughBudget() {
+		Long userId = 1L;
+		Long petId = 2L;
+		User testUser = new User();
+		testUser.setBudget(new BigDecimal(100));
+		Pet testPet = new Pet();
+		testPet.setPrice(new BigDecimal(500));
+
+		when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+		when(petRepository.findById(petId)).thenReturn(Optional.of(testPet));
+
+		assertThrows(NotEnoughBudgetException.class, () -> petService.buy(userId, petId));
+
+		verify(petRepository, times(1)).findById(petId);
 	}
 }

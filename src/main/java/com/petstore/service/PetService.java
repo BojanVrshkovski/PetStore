@@ -9,4 +9,5 @@ import java.util.List;
 public interface PetService {
 	Pet createPet(PetRequest petRequest);
 	List<PetDto> readAllPets();
+	Boolean buy(Long userId,Long petId);
 }

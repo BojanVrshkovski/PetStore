@@ -111,26 +111,27 @@ public class PetServiceImpl implements PetService {
 		BigDecimal userBudget = user.getBudget();
 		BigDecimal petPrice = pet.getPrice();
 
-		if (userBudget.compareTo(petPrice) >= 0) {
-			user.setBudget(userBudget.subtract(petPrice));
-
-			pet.setOwner(user.getUserId());
-
-			userRepository.save(user);
-			petRepository.save(pet);
-
-			if (pet.getPetType() == PetType.CAT) {
-				log.info(String.format("The cat is successfully bought"));
-				System.out.println("Meow, cat " + pet.getName() + " has owner " + user.getFirstName());
-			} else if (pet.getPetType() == PetType.DOG) {
-				log.info(String.format("The dog is successfully bought"));
-				System.out.println("Woof, dog " + pet.getName() + " has owner " + user.getFirstName());
-			}
-
-			return true;
-		} else {
+		if (userBudget.compareTo(petPrice) < 0) {
 			log.error(String.format("The user with name %s has not enough budget",user.getFirstName()));
-			throw new NotEnoughBudgetException("The user with name " + user.getFirstName() + " has not enough budget");
+			throw new NotEnoughBudgetException("Not enough budget");
 		}
+		
+		user.setBudget(userBudget.subtract(petPrice));
+
+		pet.setOwner(user.getUserId());
+
+		userRepository.save(user);
+		petRepository.save(pet);
+
+		if (pet.getPetType() == PetType.CAT) {
+			log.info(String.format("The cat is successfully bought"));
+			System.out.println("Meow, cat " + pet.getName() + " has owner " + user.getFirstName());
+		} else if (pet.getPetType() == PetType.DOG) {
+			log.info(String.format("The dog is successfully bought\""));
+			System.out.println("Woof, dog " + pet.getName() + " has owner " + user.getFirstName());
+		}
+
+		log.info(String.format("Purchase successful"));
+		return true;
 	}
 }

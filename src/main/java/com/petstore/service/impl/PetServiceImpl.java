@@ -52,7 +52,6 @@ public class PetServiceImpl implements PetService {
 				long ageInYears = ChronoUnit.YEARS.between(birthDate, currentDate);
 				BigDecimal price = BigDecimal.valueOf(ageInYears).multiply(BigDecimal.ONE);
 				pet.setPrice(price);
-
 			}else {
 				LocalDate birthDate = petRequest.getDateOfBirth();
 				LocalDate currentDate = LocalDate.now();
@@ -123,7 +122,7 @@ public class PetServiceImpl implements PetService {
 
 			return true;
 		} else {
-			log.error(String.format("The user with name %s has not enough budget"),user.getFirstName());
+			log.error(String.format("The user with name %s has not enough budget",user.getFirstName()));
 			return false;
 		}
 	}

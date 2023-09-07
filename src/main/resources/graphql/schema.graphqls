@@ -9,7 +9,14 @@ type Mutation{
     createUser(userRequest: UserInput): User
     createPet(petRequest: PetInput): Pet
     buy(userId: ID!, petId: ID!): Pet
+    buyAll: PurchaseSummary
 }
+
+type PurchaseSummary {
+    successfulPurchases: Int
+    failedPurchases: Int
+}
+
 
 input UserInput{
     firstName: String!

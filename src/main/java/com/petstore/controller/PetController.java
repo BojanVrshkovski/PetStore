@@ -2,6 +2,7 @@ package com.petstore.controller;
 
 import com.petstore.entity.Pet;
 import com.petstore.entity.dto.PetDto;
+import com.petstore.entity.entry.PurchaseSummary;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.service.PetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,11 @@ public class PetController {
 	@MutationMapping
 	public Pet buy(@Argument Long userId,@Argument Long petId){
 		return petService.buy(userId,petId);
+	}
+
+	@MutationMapping
+	public PurchaseSummary buyAll(){
+		return petService.buyAll();
 	}
 	@QueryMapping
 	public PetDto readPetById(@Argument Long petId) {

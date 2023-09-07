@@ -10,7 +10,7 @@ type Mutation{
     createPet(petRequest: PetInput): Pet
     buy(userId: ID!, petId: ID!): Pet
     buyAll: PurchaseSummary
-    createRandomUsers(count: Int!): [User]!
+    createRandomUsers(count: Int!): [User]
 }
 
 type PurchaseSummary {

@@ -35,4 +35,8 @@ public class UserController {
 	public User createUser(@Argument UserRequest userRequest){
 		return userService.createUser(userRequest);
 	}
+	@MutationMapping
+	public List<User> createRandomUsers(@Argument int count){
+		return userService.createRandomUsers(count);
+	}
 }

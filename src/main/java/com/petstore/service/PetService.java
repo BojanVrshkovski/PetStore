@@ -2,7 +2,7 @@ package com.petstore.service;
 
 import com.petstore.entity.Pet;
 import com.petstore.entity.dto.PetDto;
-import com.petstore.entity.entry.PurchaseSummary;
+import com.petstore.entity.dto.PurchaseSummary;
 import com.petstore.entity.request.PetRequest;
 
 import java.util.List;

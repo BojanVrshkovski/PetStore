@@ -1,4 +1,4 @@
-package com.petstore.entity.entry;
+package com.petstore.entity.dto;
 
 import lombok.Data;
 

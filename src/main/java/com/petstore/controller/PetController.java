@@ -2,7 +2,7 @@ package com.petstore.controller;
 
 import com.petstore.entity.Pet;
 import com.petstore.entity.dto.PetDto;
-import com.petstore.entity.entry.PurchaseSummary;
+import com.petstore.entity.dto.PurchaseSummary;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.service.PetService;
 import org.springframework.beans.factory.annotation.Autowired;

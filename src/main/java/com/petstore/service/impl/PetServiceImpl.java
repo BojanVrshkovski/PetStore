@@ -3,7 +3,7 @@ package com.petstore.service.impl;
 import com.petstore.entity.Pet;
 import com.petstore.entity.User;
 import com.petstore.entity.dto.PetDto;
-import com.petstore.entity.entry.PurchaseSummary;
+import com.petstore.entity.dto.PurchaseSummary;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.exception.NoPetsFoundException;
@@ -149,14 +149,12 @@ public class PetServiceImpl implements PetService {
 					buy(user.getUserId(), pet.getPetId());
 					successfulPurchases++;
 				} catch (Exception e) {
-					// Handle exceptions, log errors, or take other actions as needed
 					log.error(String.format("User %s could not make a purchase: %s", user.getFirstName(), e.getMessage()));
 					failedPurchases++;
 				}
 			}
 		}
-
-		// Create and return the PurchaseSummary object
+		
 		PurchaseSummary purchaseSummary = new PurchaseSummary();
 		purchaseSummary.setSuccessfulPurchases(successfulPurchases);
 		purchaseSummary.setFailedPurchases(failedPurchases);

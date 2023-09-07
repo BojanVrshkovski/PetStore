@@ -154,7 +154,7 @@ public class PetServiceImpl implements PetService {
 				}
 			}
 		}
-		
+
 		PurchaseSummary purchaseSummary = new PurchaseSummary();
 		purchaseSummary.setSuccessfulPurchases(successfulPurchases);
 		purchaseSummary.setFailedPurchases(failedPurchases);

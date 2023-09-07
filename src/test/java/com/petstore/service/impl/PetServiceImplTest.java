@@ -184,7 +184,7 @@ public class PetServiceImplTest {
 		when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
 		when(petRepository.findById(petId)).thenReturn(Optional.empty());
 
-		assertThrows(NoPetsFoundException.class, () -> petService.buy(userId, petId));
+		assertThrows(PetNotFoundException.class, () -> petService.buy(userId, petId));
 
 		verify(userRepository, times(1)).findById(userId);
 	}
@@ -257,4 +257,5 @@ public class PetServiceImplTest {
 
 		assertThrows(PetNotFoundException.class, () -> petService.readPetById(petId));
 	}
+
 }

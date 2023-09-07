@@ -32,7 +32,6 @@ import static org.mockito.Mockito.when;
 public class PetControllerTest {
 	@InjectMocks
 	private PetController petController;
-
 	@Mock
 	private PetService petService;
 	@Mock

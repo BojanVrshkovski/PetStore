@@ -10,4 +10,5 @@ public interface UserService {
 	UserDto readUserById(Long userId);
 	List<UserDto> readAllUsers();
 	User createUser(UserRequest userRequest);
+	List<User> createRandomUsers(int count);
 }

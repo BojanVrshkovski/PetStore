@@ -1,6 +1,5 @@
 package com.petstore.service.impl;
 
-import com.github.javafaker.Faker;
 import com.petstore.entity.User;
 import com.petstore.entity.dto.UserDto;
 import com.petstore.entity.request.UserRequest;
@@ -15,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;

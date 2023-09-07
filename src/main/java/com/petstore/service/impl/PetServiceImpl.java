@@ -7,7 +7,6 @@ import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.dto.PurchaseSummary;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
-import com.petstore.entity.request.UserRequest;
 import com.petstore.exception.NoPetsFoundException;
 import com.petstore.exception.NotEnoughBudgetException;
 import com.petstore.exception.PetAlredyExistsException;

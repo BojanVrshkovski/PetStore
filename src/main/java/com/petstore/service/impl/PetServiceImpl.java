@@ -1,11 +1,13 @@
 package com.petstore.service.impl;
 
+import com.github.javafaker.Faker;
 import com.petstore.entity.Pet;
 import com.petstore.entity.User;
 import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.dto.PurchaseSummary;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
+import com.petstore.entity.request.UserRequest;
 import com.petstore.exception.NoPetsFoundException;
 import com.petstore.exception.NotEnoughBudgetException;
 import com.petstore.exception.PetAlredyExistsException;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -166,5 +169,35 @@ public class PetServiceImpl implements PetService {
 		log.info(String.format("Pet with id: %d is being fetched", petId));
 		Pet pet = petRepository.findById(petId).orElseThrow(PetNotFoundException::new);
 		return modelMapper.map(pet, PetDto.class);
+	}
+
+	@Override
+	public List<Pet> createMultiplePets(int count) {
+		if (count <= 0 || count > 10) {
+			throw new IllegalArgumentException("Count should be between 1 and 20");
+		}
+
+		List<Pet> createdPets = new ArrayList<>();
+
+		for (int i = 0; i < count; i++) {
+			PetRequest randomPetRequest = generateRandomPetData();
+			Pet createdPet = createPet(randomPetRequest);
+			createdPets.add(createdPet);
+		}
+
+		return createdPets;
+	}
+
+	private PetRequest generateRandomPetData(){
+		Faker faker = new Faker();
+
+		PetRequest petRequest = new PetRequest();
+		petRequest.setName(faker.animal().name());
+		petRequest.setRating(faker.number().numberBetween(1,10));
+		petRequest.setPetType(Math.random() < 0.5 ? PetType.CAT : PetType.DOG);
+		petRequest.setDescription(faker.lorem().sentence());
+		petRequest.setDateOfBirth(LocalDate.now());
+
+		return petRequest;
 	}
 }

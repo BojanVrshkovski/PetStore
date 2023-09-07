@@ -13,4 +13,5 @@ public interface PetService {
 	Pet buy(Long userId,Long petId);
 	PetDto readPetById(Long petId);
 	PurchaseSummary buyAll();
+	List<Pet> createMultiplePets(int count);
 }

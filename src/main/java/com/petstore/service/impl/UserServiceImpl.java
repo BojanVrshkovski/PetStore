@@ -28,6 +28,7 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final ModelMapper modelMapper;
 
+
 	@Autowired
 	public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
 		this.userRepository = userRepository;
@@ -88,7 +89,7 @@ public class UserServiceImpl implements UserService {
 		return createdUsers;
 	}
 
-	private UserRequest generateRandomUserData() {
+	public UserRequest generateRandomUserData() {
 		Faker faker = new Faker();
 
 		UserRequest userRequest = new UserRequest();

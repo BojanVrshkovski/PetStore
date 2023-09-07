@@ -1,5 +1,6 @@
 package com.petstore.service.impl;
 
+import com.github.javafaker.Faker;
 import com.petstore.entity.User;
 import com.petstore.entity.dto.UserDto;
 import com.petstore.entity.request.UserRequest;
@@ -14,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -162,4 +164,21 @@ public class UserServiceImplTest {
 	public void testCreateUserNullInput() {
 		assertThrows(IllegalArgumentException.class, () -> userService.createUser(null));
 	}
+
+	@Test
+	public void testCreateRandomUsersInvalidCount() {
+		int count = 0; // Invalid count
+
+		// Ensure that an IllegalArgumentException is thrown for invalid input
+		assertThrows(IllegalArgumentException.class, () -> userService.createRandomUsers(count));
+	}
+
+	@Test
+	public void testCreateRandomUsersExceedsLimit() {
+		int count = 11; // Exceeds the limit
+
+		// Ensure that an IllegalArgumentException is thrown for exceeding the limit
+		assertThrows(IllegalArgumentException.class, () -> userService.createRandomUsers(count));
+	}
+
 }

@@ -11,6 +11,7 @@ type Mutation{
     buy(userId: ID!, petId: ID!): Pet
     buyAll: PurchaseSummary
     createRandomUsers(count: Int!): [User]
+    createRandomPets(count: Int!): [Pet]
 }
 
 type PurchaseSummary {
@@ -53,7 +54,7 @@ type UserDto {
 
 type Pet {
     petId: ID!
-    owner: User!
+    owner: User
     name: String!
     petType: String!
     description: String
@@ -64,7 +65,7 @@ type Pet {
 
 type PetDto {
     petId: ID!
-    owner: User!
+    owner: User
     name: String!
     petType: String!
     description: String

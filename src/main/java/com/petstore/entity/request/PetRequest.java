@@ -36,13 +36,4 @@ public class PetRequest {
 		this.rating = rating;
 	}
 
-	public PetRequest(
-		String name, PetType petType, String description, LocalDate dateOfBirth, BigDecimal price, Integer rating) {
-		this.name = name;
-		this.petType = petType;
-		this.description = description;
-		this.dateOfBirth = dateOfBirth;
-		this.price = price;
-		this.rating = rating;
-	}
 }

@@ -45,4 +45,8 @@ public class PetController {
 	public PetDto readPetById(@Argument Long petId) {
 		return petService.readPetById(petId);
 	}
+	@MutationMapping
+	public List<Pet> createRandomPets(@Argument int count){
+		return petService.createRandomPets(count);
+	}
 }

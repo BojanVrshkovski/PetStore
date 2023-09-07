@@ -172,8 +172,8 @@ public class PetServiceImpl implements PetService {
 	}
 
 	@Override
-	public List<Pet> createMultiplePets(int count) {
-		if (count <= 0 || count > 10) {
+	public List<Pet> createRandomPets(int count) {
+		if (count <= 0 || count > 20) {
 			throw new IllegalArgumentException("Count should be between 1 and 20");
 		}
 

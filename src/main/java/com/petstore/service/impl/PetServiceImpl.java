@@ -195,7 +195,7 @@ public class PetServiceImpl implements PetService {
 		petRequest.setRating(faker.number().numberBetween(1,10));
 		petRequest.setPetType(Math.random() < 0.5 ? PetType.CAT : PetType.DOG);
 		petRequest.setDescription(faker.lorem().sentence());
-		
+
 		LocalDate currentDate = LocalDate.now();
 		LocalDate minBirthDate = currentDate.minusYears(15);
 		LocalDate maxBirthDate = currentDate.minusYears(5);

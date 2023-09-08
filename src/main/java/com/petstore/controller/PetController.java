@@ -1,7 +1,7 @@
 package com.petstore.controller;
 
-import com.petstore.entity.BuyLogEntry;
 import com.petstore.entity.Pet;
+import com.petstore.entity.dto.BuyLogEntryDto;
 import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.dto.PurchaseSummary;
 import com.petstore.entity.request.PetRequest;
@@ -51,7 +51,7 @@ public class PetController {
 		return petService.createRandomPets(count);
 	}
 	@QueryMapping
-	public List<BuyLogEntry> readBuyHistory(){
+	public List<BuyLogEntryDto> readBuyHistory(){
 		return petService.readBuyHistory();
 	}
 }

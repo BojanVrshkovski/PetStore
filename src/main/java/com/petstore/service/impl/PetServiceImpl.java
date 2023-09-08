@@ -4,11 +4,13 @@ import com.github.javafaker.Faker;
 import com.petstore.entity.BuyLogEntry;
 import com.petstore.entity.Pet;
 import com.petstore.entity.User;
+import com.petstore.entity.dto.BuyLogEntryDto;
 import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.dto.PurchaseSummary;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.exception.NoPetsFoundException;
+import com.petstore.exception.NoUsersFoundException;
 import com.petstore.exception.NotEnoughBudgetException;
 import com.petstore.exception.PetAlredyExistsException;
 import com.petstore.exception.PetAlredyHasOwnerException;
@@ -216,8 +218,16 @@ public class PetServiceImpl implements PetService {
 	}
 
 	@Override
-	public List<BuyLogEntry> readBuyHistory() {
-		return buyLogEntryRepository.findAll();
+	public List<BuyLogEntryDto> readBuyHistory() {
+		List<BuyLogEntry> buyLogEntries = buyLogEntryRepository.findAll();
+		if (buyLogEntries.isEmpty()) {
+			log.error(String.format("No users found"));
+			throw new NoUsersFoundException("No users found");
+		}
+		log.info(String.format("Retriving all the users"));
+		return buyLogEntries.stream()
+		            .map(buyLogEntrie -> modelMapper.map(buyLogEntrie, BuyLogEntryDto.class))
+		            .collect(Collectors.toList());
 	}
 
 	private PetRequest generateRandomPetData(){

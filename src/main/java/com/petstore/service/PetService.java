@@ -1,7 +1,7 @@
 package com.petstore.service;
 
-import com.petstore.entity.BuyLogEntry;
 import com.petstore.entity.Pet;
+import com.petstore.entity.dto.BuyLogEntryDto;
 import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.dto.PurchaseSummary;
 import com.petstore.entity.request.PetRequest;
@@ -15,5 +15,5 @@ public interface PetService {
 	PetDto readPetById(Long petId);
 	PurchaseSummary buyAll();
 	List<Pet> createRandomPets(int count);
-	List<BuyLogEntry> readBuyHistory();
+	List<BuyLogEntryDto> readBuyHistory();
 }

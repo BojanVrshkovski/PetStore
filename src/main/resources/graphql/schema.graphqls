@@ -3,7 +3,7 @@ type Query {
     readUserById(id : ID!): User
     readAllPets: [PetDto]
     readPetById(petId: ID!): Pet
-    readBuyHistory: [BuyLogEntry]
+    readBuyHistory: [BuyLogEntryDto]
 }
 
 type Mutation{
@@ -75,7 +75,7 @@ type PetDto {
     rating: Int
 }
 
-type BuyLogEntry {
+type BuyLogEntryDto {
     id: ID!
     executionDate: String!
     userId: Int!

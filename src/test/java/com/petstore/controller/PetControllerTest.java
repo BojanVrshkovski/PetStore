@@ -2,10 +2,12 @@ package com.petstore.controller;
 
 import com.petstore.entity.Pet;
 import com.petstore.entity.User;
+import com.petstore.entity.dto.BuyLogEntryDto;
 import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.dto.UserDto;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
+import com.petstore.exception.NoBuyLogEntriesException;
 import com.petstore.exception.NoPetsFoundException;
 import com.petstore.exception.PetNotFoundException;
 import com.petstore.service.PetService;
@@ -18,6 +20,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.DataIntegrityViolationException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -201,6 +204,27 @@ public class PetControllerTest {
 		}
 	}
 
+	@Test
+	public void testReadAllBuyLogsSuccess(){
+		List<BuyLogEntryDto> expectedBuyLogs = Arrays.asList(
+			new BuyLogEntryDto(1L, LocalDateTime.now(),2L,true),
+			new BuyLogEntryDto(2L, LocalDateTime.now(),3L,false)
+		);
+
+		when(petService.readBuyHistory()).thenReturn(expectedBuyLogs);
+
+		List<BuyLogEntryDto> result = petController.readBuyHistory();
+
+		assertNotNull(result);
+		assertEquals(expectedBuyLogs.size(),result.size());
+	}
+
+	@Test
+	public void testReadAllBuyLogsFailure(){
+		when(petService.readBuyHistory()).thenThrow(NoBuyLogEntriesException.class);
+
+		assertThrows(NoBuyLogEntriesException.class, () -> petController.readBuyHistory());
+	}
 
 	private List<Pet> createDummyPets(int count) {
 		List<Pet> pets = new ArrayList<>();

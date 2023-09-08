@@ -148,7 +148,6 @@ public class UserControllerTest {
 			assertEquals(expectedUser.getBudget(), actualUser.getBudget());
 		}
 	}
-	
 
 	private List<User> createDummyUsers(int count) {
 		List<User> users = new ArrayList<>();

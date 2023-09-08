@@ -1,15 +1,19 @@
 package com.petstore.service.impl;
 
+import com.petstore.entity.BuyLogEntry;
 import com.petstore.entity.Pet;
 import com.petstore.entity.User;
+import com.petstore.entity.dto.BuyLogEntryDto;
 import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
+import com.petstore.exception.NoBuyLogEntriesException;
 import com.petstore.exception.NoPetsFoundException;
 import com.petstore.exception.NotEnoughBudgetException;
 import com.petstore.exception.PetAlredyExistsException;
 import com.petstore.exception.PetAlredyHasOwnerException;
 import com.petstore.exception.PetNotFoundException;
+import com.petstore.repository.BuyLogEntryRepository;
 import com.petstore.repository.PetRepository;
 import com.petstore.repository.UserRepository;
 import org.junit.Test;
@@ -24,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import org.springframework.dao.DataIntegrityViolationException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +51,8 @@ public class PetServiceImplTest {
 
 	@Mock
 	private PetRepository petRepository;
+	@Mock
+	private BuyLogEntryRepository buyLogEntryRepository;
 	@Mock
 	private UserRepository userRepository;
 
@@ -275,6 +282,34 @@ public class PetServiceImplTest {
 		int count = 21;
 
 		assertThrows(IllegalArgumentException.class, () -> petService.createRandomPets(count));
+	}
+
+	@Test
+	public void testReadAllBuyLogsSuccess() {
+		BuyLogEntry buyLogEntry1 = new BuyLogEntry(1L, LocalDateTime.now(), 2L, true);
+		BuyLogEntry buyLogEntry2 = new BuyLogEntry(2L, LocalDateTime.now(), 3L, false);
+
+		List<BuyLogEntry> mockBuyLogs = List.of(buyLogEntry1, buyLogEntry2);
+		when(buyLogEntryRepository.findAll()).thenReturn(mockBuyLogs);
+
+		BuyLogEntryDto buyLogEntryDto1 = new BuyLogEntryDto(1L, LocalDateTime.now(), 2L, true);
+		BuyLogEntryDto buyLogEntryDto2 = new BuyLogEntryDto(2L, LocalDateTime.now(), 3L, false);
+
+		List<BuyLogEntryDto> expectedBuyLogEntryDtos = List.of(buyLogEntryDto1, buyLogEntryDto2);
+		when(modelMapper.map(any(BuyLogEntry.class), eq(BuyLogEntryDto.class)))
+			.thenReturn(expectedBuyLogEntryDtos.get(0), expectedBuyLogEntryDtos.get(1));
+
+		List<BuyLogEntryDto> actualBuyLogEntryDtos = petService.readBuyHistory();
+
+		assertEquals(expectedBuyLogEntryDtos.size(), actualBuyLogEntryDtos.size());
+		assertEquals(expectedBuyLogEntryDtos, actualBuyLogEntryDtos);
+	}
+
+	@Test
+	public void testReadAllBuyLogsEmptyList(){
+		when(buyLogEntryRepository.findAll()).thenReturn(Collections.emptyList());
+
+		assertThrows(NoBuyLogEntriesException.class, () -> petService.readBuyHistory());
 	}
 
 }

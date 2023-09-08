@@ -11,7 +11,6 @@ import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.exception.NoBuyLogEntriesException;
 import com.petstore.exception.NoPetsFoundException;
-import com.petstore.exception.NoUsersFoundException;
 import com.petstore.exception.NotEnoughBudgetException;
 import com.petstore.exception.PetAlredyExistsException;
 import com.petstore.exception.PetAlredyHasOwnerException;
@@ -41,14 +40,15 @@ public class PetServiceImpl implements PetService {
 	private static final Logger log = LoggerFactory.getLogger(PetServiceImpl.class);
 	private final PetRepository petRepository;
 	private final UserRepository userRepository;
-	@Autowired
-	private BuyLogEntryRepository buyLogEntryRepository;
+	private final BuyLogEntryRepository buyLogEntryRepository;
 	private final ModelMapper modelMapper;
 
 	@Autowired
-	public PetServiceImpl(PetRepository petRepository, UserRepository userRepository, ModelMapper modelMapper) {
+	public PetServiceImpl(PetRepository petRepository, UserRepository userRepository,
+	                      BuyLogEntryRepository buyLogEntryRepository, ModelMapper modelMapper) {
 		this.petRepository = petRepository;
 		this.userRepository = userRepository;
+		this.buyLogEntryRepository = buyLogEntryRepository;
 		this.modelMapper = modelMapper;
 	}
 

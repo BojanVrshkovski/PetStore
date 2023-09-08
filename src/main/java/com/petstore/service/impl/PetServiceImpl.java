@@ -1,6 +1,7 @@
 package com.petstore.service.impl;
 
 import com.github.javafaker.Faker;
+import com.petstore.entity.BuyLogEntry;
 import com.petstore.entity.Pet;
 import com.petstore.entity.User;
 import com.petstore.entity.dto.PetDto;
@@ -13,6 +14,7 @@ import com.petstore.exception.PetAlredyExistsException;
 import com.petstore.exception.PetAlredyHasOwnerException;
 import com.petstore.exception.PetNotFoundException;
 import com.petstore.exception.UserNotFoundException;
+import com.petstore.repository.BuyLogEntryRepository;
 import com.petstore.repository.PetRepository;
 import com.petstore.repository.UserRepository;
 import com.petstore.service.PetService;
@@ -24,6 +26,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,8 @@ public class PetServiceImpl implements PetService {
 	private static final Logger log = LoggerFactory.getLogger(PetServiceImpl.class);
 	private final PetRepository petRepository;
 	private final UserRepository userRepository;
+	@Autowired
+	private BuyLogEntryRepository buyLogEntryRepository;
 	private final ModelMapper modelMapper;
 
 	@Autowired
@@ -94,6 +99,7 @@ public class PetServiceImpl implements PetService {
 	public Pet buy(Long userId, Long petId) {
 		Optional<User> userOptional = userRepository.findById(userId);
 		Optional<Pet> petOptional = petRepository.findById(petId);
+		BuyLogEntry logEntry = new BuyLogEntry();
 
 		if (userOptional.isEmpty()) {
 			log.error(String.format("The user you provided is not found"));
@@ -107,6 +113,10 @@ public class PetServiceImpl implements PetService {
 		Pet pet = petOptional.get();
 
 		if (pet.getOwner() != null) {
+			logEntry.setExecutionDate(LocalDateTime.now());
+			logEntry.setAllowedToBuy(false);
+			logEntry.setUserId(user.getUserId());
+			buyLogEntryRepository.save(logEntry);
 			log.error(String.format("Pet already has an owner"));
 			throw new PetAlredyHasOwnerException("Pet already has an owner");
 		}
@@ -115,9 +125,14 @@ public class PetServiceImpl implements PetService {
 		BigDecimal petPrice = pet.getPrice();
 
 		if (userBudget.compareTo(petPrice) < 0) {
+			logEntry.setExecutionDate(LocalDateTime.now());
+			logEntry.setAllowedToBuy(false);
+			logEntry.setUserId(user.getUserId());
+			buyLogEntryRepository.save(logEntry);
 			log.error(String.format("The user with name %s has not enough budget",user.getFirstName()));
 			throw new NotEnoughBudgetException("Not enough budget");
 		}
+
 
 		user.setBudget(userBudget.subtract(petPrice));
 
@@ -125,6 +140,13 @@ public class PetServiceImpl implements PetService {
 
 		userRepository.save(user);
 		petRepository.save(pet);
+
+
+		logEntry.setExecutionDate(LocalDateTime.now());
+		logEntry.setAllowedToBuy(true);
+		logEntry.setUserId(user.getUserId());
+
+		buyLogEntryRepository.save(logEntry);
 
 		if (pet.getPetType() == PetType.CAT) {
 			log.info(String.format("The cat is successfully bought"));
@@ -191,6 +213,11 @@ public class PetServiceImpl implements PetService {
 		}
 
 		return createdPets;
+	}
+
+	@Override
+	public List<BuyLogEntry> readBuyHistory() {
+		return buyLogEntryRepository.findAll();
 	}
 
 	private PetRequest generateRandomPetData(){

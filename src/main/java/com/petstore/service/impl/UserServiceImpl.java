@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +72,7 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 
+	@Override
 	public List<User> createRandomUsers(int count) {
 		if (count <= 0 || count > 10) {
 			throw new IllegalArgumentException("Count should be between 1 and 10");

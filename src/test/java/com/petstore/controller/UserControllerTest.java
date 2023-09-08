@@ -15,6 +15,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
@@ -122,5 +123,44 @@ public class UserControllerTest {
 		}
 
 		verify(userService, times(1)).createUser(userRequest);
+	}
+
+	@Test
+	public void testCreateRandomUsersSuccess() {
+		int count = 5;
+		List<User> expectedUsers = createDummyUsers(count);
+
+		when(userService.createRandomUsers(count)).thenReturn(expectedUsers);
+
+		List<User> result = userController.createRandomUsers(count);
+
+		assertNotNull(result);
+		assertEquals(count, result.size());
+
+		for (int i = 0; i < count; i++) {
+			User expectedUser = expectedUsers.get(i);
+			User actualUser = result.get(i);
+
+			assertNotNull(actualUser.getUserId());
+			assertEquals(expectedUser.getFirstName(), actualUser.getFirstName());
+			assertEquals(expectedUser.getLastName(), actualUser.getLastName());
+			assertEquals(expectedUser.getEmailAddress(), actualUser.getEmailAddress());
+			assertEquals(expectedUser.getBudget(), actualUser.getBudget());
+		}
+	}
+	
+
+	private List<User> createDummyUsers(int count) {
+		List<User> users = new ArrayList<>();
+		for (int i = 1; i <= count; i++) {
+			User user = new User();
+			user.setUserId((long) i);
+			user.setFirstName("User" + i);
+			user.setLastName("LastName" + i);
+			user.setEmailAddress("user" + i + "@example.com");
+			user.setBudget(BigDecimal.valueOf(1000 + i * 100));
+			users.add(user);
+		}
+		return users;
 	}
 }

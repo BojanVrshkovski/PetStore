@@ -258,4 +258,23 @@ public class PetServiceImplTest {
 		assertThrows(PetNotFoundException.class, () -> petService.readPetById(petId));
 	}
 
+	@Test
+	public void testCreateUserNullInput() {
+		assertThrows(IllegalArgumentException.class, () -> petService.createPet(null));
+	}
+
+	@Test
+	public void testCreateRandomUsersInvalidCount() {
+		int count = 0;
+
+		assertThrows(IllegalArgumentException.class, () -> petService.createRandomPets(count));
+	}
+
+	@Test
+	public void testCreateRandomUsersExceedsLimit() {
+		int count = 21;
+
+		assertThrows(IllegalArgumentException.class, () -> petService.createRandomPets(count));
+	}
+
 }

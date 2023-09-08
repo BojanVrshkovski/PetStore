@@ -59,4 +59,16 @@ public class Pet {
 		this.price = price;
 		this.rating = rating;
 	}
+
+	public Pet(
+		Long petId, String name, PetType petType, String description, LocalDate dateOfBirth, BigDecimal price,
+		Integer rating) {
+		this.petId = petId;
+		this.name = name;
+		this.petType = petType;
+		this.description = description;
+		this.dateOfBirth = dateOfBirth;
+		this.price = price;
+		this.rating = rating;
+	}
 }

@@ -72,6 +72,7 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 
+	@Override
 	public List<User> createRandomUsers(int count) {
 		if (count <= 0 || count > 10) {
 			throw new IllegalArgumentException("Count should be between 1 and 10");

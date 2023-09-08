@@ -165,17 +165,15 @@ public class UserServiceImplTest {
 
 	@Test
 	public void testCreateRandomUsersInvalidCount() {
-		int count = 0; // Invalid count
+		int count = 0;
 
-		// Ensure that an IllegalArgumentException is thrown for invalid input
 		assertThrows(IllegalArgumentException.class, () -> userService.createRandomUsers(count));
 	}
 
 	@Test
 	public void testCreateRandomUsersExceedsLimit() {
-		int count = 11; // Exceeds the limit
+		int count = 11;
 
-		// Ensure that an IllegalArgumentException is thrown for exceeding the limit
 		assertThrows(IllegalArgumentException.class, () -> userService.createRandomUsers(count));
 	}
 

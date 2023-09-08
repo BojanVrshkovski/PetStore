@@ -9,6 +9,7 @@ import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.dto.PurchaseSummary;
 import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
+import com.petstore.exception.NoBuyLogEntriesException;
 import com.petstore.exception.NoPetsFoundException;
 import com.petstore.exception.NoUsersFoundException;
 import com.petstore.exception.NotEnoughBudgetException;
@@ -221,10 +222,10 @@ public class PetServiceImpl implements PetService {
 	public List<BuyLogEntryDto> readBuyHistory() {
 		List<BuyLogEntry> buyLogEntries = buyLogEntryRepository.findAll();
 		if (buyLogEntries.isEmpty()) {
-			log.error(String.format("No users found"));
-			throw new NoUsersFoundException("No users found");
+			log.error(String.format("No buyLogEntries found"));
+			throw new NoBuyLogEntriesException("No buyLogEntries found");
 		}
-		log.info(String.format("Retriving all the users"));
+		log.info(String.format("Retriving all the buyLogEntries"));
 		return buyLogEntries.stream()
 		            .map(buyLogEntrie -> modelMapper.map(buyLogEntrie, BuyLogEntryDto.class))
 		            .collect(Collectors.toList());

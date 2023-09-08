@@ -18,6 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.DataIntegrityViolationException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -171,6 +172,51 @@ public class PetControllerTest {
 		when(petService.readPetById(petId)).thenThrow(PetNotFoundException.class);
 
 		assertThrows(PetNotFoundException.class, () -> petController.readPetById(petId));
+	}
+
+	@Test
+	public void testCreateRandomUsersSuccess() {
+		int count = 5;
+		List<Pet> expectedPets = createDummyPets(count);
+
+		when(petService.createRandomPets(count)).thenReturn(expectedPets);
+
+		List<Pet> result = petController.createRandomPets(count);
+
+		assertNotNull(result);
+		assertEquals(count, result.size());
+
+		for (int i = 0; i < count; i++) {
+			Pet expectedPet = expectedPets.get(i);
+			Pet actualPet = result.get(i);
+
+			assertNotNull(actualPet.getPetId());
+			assertEquals(expectedPet.getOwner(), actualPet.getOwner());
+			assertEquals(expectedPet.getName(), actualPet.getName());
+			assertEquals(expectedPet.getPetType(), actualPet.getPetType());
+			assertEquals(expectedPet.getDescription(), actualPet.getDescription());
+			assertEquals(expectedPet.getDateOfBirth(), actualPet.getDateOfBirth());
+			assertEquals(expectedPet.getRating(), actualPet.getRating());
+			assertEquals(expectedPet.getPrice(), actualPet.getPrice());
+		}
+	}
+
+
+	private List<Pet> createDummyPets(int count) {
+		List<Pet> pets = new ArrayList<>();
+		for (int i = 1; i <= count; i++) {
+			Pet pet = new Pet();
+			pet.setPetId((long) i);
+			pet.setOwner((long) i);
+			pet.setName("Toffi");
+			pet.setPetType(PetType.CAT);
+			pet.setDescription("The best cat");
+			pet.setPrice(new BigDecimal(100.00));
+			pet.setRating(10);
+
+			pets.add(pet);
+		}
+		return pets;
 	}
 
 }

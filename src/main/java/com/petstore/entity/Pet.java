@@ -59,4 +59,5 @@ public class Pet {
 		this.price = price;
 		this.rating = rating;
 	}
+	
 }

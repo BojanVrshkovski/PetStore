@@ -138,6 +138,7 @@ public class PetServiceImpl implements PetService {
 		return pet;
 	}
 
+	@Override
 	public PurchaseSummary buyAll() {
 		List<User> users = userRepository.findAll();
 		List<Pet> availablePets = petRepository.findAvailablePets();
@@ -146,13 +147,18 @@ public class PetServiceImpl implements PetService {
 		int failedPurchases = 0;
 
 		for (User user : users) {
+			boolean hasPet = false;
+
 			for (Pet pet : availablePets) {
-				try {
-					buy(user.getUserId(), pet.getPetId());
-					successfulPurchases++;
-				} catch (Exception e) {
-					log.error(String.format("User %s could not make a purchase: %s", user.getFirstName(), e.getMessage()));
-					failedPurchases++;
+				if (!hasPet) {
+					try {
+						buy(user.getUserId(), pet.getPetId());
+						successfulPurchases++;
+						hasPet = true;
+					} catch (Exception e) {
+						log.error(String.format("User %s could not make a purchase: %s", user.getFirstName(), e.getMessage()));
+						failedPurchases++;
+					}
 				}
 			}
 		}

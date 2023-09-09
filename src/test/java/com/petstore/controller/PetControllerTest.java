@@ -19,6 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.DataIntegrityViolationException;
 import java.util.Arrays;
 import java.util.List;
+import static com.petstore.constants.LoggerAndExceptionConstants.PET_ALREDY_EXISTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -84,13 +85,13 @@ public class PetControllerTest {
 
 	@Test
 	public void testCreatePetFailure() {
-		when(petService.createPet(petRequest)).thenThrow(new DataIntegrityViolationException("Pet alredy exists"));
+		when(petService.createPet(petRequest)).thenThrow(new DataIntegrityViolationException(PET_ALREDY_EXISTS));
 
 		try {
 			petController.createPet(petRequest);
 			fail("Expected exception was not thrown");
 		} catch (Exception ex) {
-			assertEquals("Pet alredy exists", ex.getMessage());
+			assertEquals(PET_ALREDY_EXISTS, ex.getMessage());
 		}
 
 		verify(petService, times(1)).createPet(petRequest);

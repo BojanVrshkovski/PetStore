@@ -34,6 +34,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import static com.petstore.constants.LoggerAndExceptionConstants.CAT_SUCCESSFULLY_BOUGHT;
+import static com.petstore.constants.LoggerAndExceptionConstants.CONUT_RANGE_1_TO_20;
+import static com.petstore.constants.LoggerAndExceptionConstants.DOG_SUCCESSFULLY_BOUGHT;
+import static com.petstore.constants.LoggerAndExceptionConstants.NO_BUY_LOG_ENTRIES_FOUND;
+import static com.petstore.constants.LoggerAndExceptionConstants.NO_PETS_FOUND;
+import static com.petstore.constants.LoggerAndExceptionConstants.PET_ALREDY_EXISTS;
+import static com.petstore.constants.LoggerAndExceptionConstants.PET_ALREDY_HAS_OWNER;
+import static com.petstore.constants.LoggerAndExceptionConstants.PET_IS_BEING_FETCHED;
+import static com.petstore.constants.LoggerAndExceptionConstants.PET_IS_SUCCESSFULLY_ADDED_DB;
+import static com.petstore.constants.LoggerAndExceptionConstants.PET_NOT_FOUND;
+import static com.petstore.constants.LoggerAndExceptionConstants.PET_REQUEST_IS_NULL;
+import static com.petstore.constants.LoggerAndExceptionConstants.PURCHASE_SUCCESSFUL;
+import static com.petstore.constants.LoggerAndExceptionConstants.RETRIVING_ALL_BUY_LOG_ENTRIES;
+import static com.petstore.constants.LoggerAndExceptionConstants.RETRIVING_ALL_PETS;
+import static com.petstore.constants.LoggerAndExceptionConstants.USER_COULD_NOT_MAKE_PURCHASE;
+import static com.petstore.constants.LoggerAndExceptionConstants.USER_NOT_ENOUGH_BUDGET;
+import static com.petstore.constants.LoggerAndExceptionConstants.USER_NOT_FOUND;
 
 @Service
 public class PetServiceImpl implements PetService {
@@ -55,7 +72,7 @@ public class PetServiceImpl implements PetService {
 	@Override
 	public Pet createPet(PetRequest petRequest) {
 		if (petRequest == null) {
-			throw new IllegalArgumentException("petRequest is null");
+			throw new IllegalArgumentException(PET_REQUEST_IS_NULL);
 		}
 		Pet pet;
 		try {
@@ -77,10 +94,10 @@ public class PetServiceImpl implements PetService {
 			}
 
 			pet = petRepository.save(pet);
-			log.info(String.format("Pet successfully added in database with name: %s",petRequest.getName()));
+			log.info(String.format(PET_IS_SUCCESSFULLY_ADDED_DB,petRequest.getName()));
 		}catch (DataIntegrityViolationException e){
-			log.error(String.format("The pet alredy exists"));
-			throw new PetAlredyExistsException("The pet alredy exists");
+			log.error(String.format(PET_ALREDY_EXISTS));
+			throw new PetAlredyExistsException(PET_ALREDY_EXISTS);
 		}
 		return pet;
 	}
@@ -89,10 +106,10 @@ public class PetServiceImpl implements PetService {
 	public List<PetDto> readAllPets() {
 		List<Pet> pets = petRepository.findAll();
 		if (pets.isEmpty()) {
-			log.error(String.format("No pets found"));
-			throw new NoPetsFoundException("No pets found");
+			log.error(String.format(NO_PETS_FOUND));
+			throw new NoPetsFoundException(NO_PETS_FOUND);
 		}
-		log.info(String.format("Retriving all the pets"));
+		log.info(String.format(RETRIVING_ALL_PETS));
 		return pets.stream()
 		            .map(pet -> modelMapper.map(pet, PetDto.class))
 		            .collect(Collectors.toList());
@@ -105,10 +122,10 @@ public class PetServiceImpl implements PetService {
 		BuyLogEntry logEntry = new BuyLogEntry();
 
 		if (userOptional.isEmpty()) {
-			log.error(String.format("The user you provided is not found"));
+			log.error(String.format(USER_NOT_FOUND));
 			throw new UserNotFoundException();
 		}else if (petOptional.isEmpty()){
-			log.error(String.format("Pet not found"));
+			log.error(String.format(PET_NOT_FOUND));
 			throw new PetNotFoundException();
 		}
 
@@ -120,8 +137,8 @@ public class PetServiceImpl implements PetService {
 			logEntry.setAllowedToBuy(false);
 			logEntry.setUserId(user.getUserId());
 			buyLogEntryRepository.save(logEntry);
-			log.error(String.format("Pet already has an owner"));
-			throw new PetAlredyHasOwnerException("Pet already has an owner");
+			log.error(String.format(PET_ALREDY_HAS_OWNER));
+			throw new PetAlredyHasOwnerException(PET_ALREDY_HAS_OWNER);
 		}
 
 		BigDecimal userBudget = user.getBudget();
@@ -132,8 +149,8 @@ public class PetServiceImpl implements PetService {
 			logEntry.setAllowedToBuy(false);
 			logEntry.setUserId(user.getUserId());
 			buyLogEntryRepository.save(logEntry);
-			log.error(String.format("The user with name %s has not enough budget",user.getFirstName()));
-			throw new NotEnoughBudgetException("Not enough budget");
+			log.error(String.format(USER_NOT_ENOUGH_BUDGET,user.getFirstName()));
+			throw new NotEnoughBudgetException(USER_NOT_ENOUGH_BUDGET);
 		}
 
 
@@ -152,14 +169,14 @@ public class PetServiceImpl implements PetService {
 		buyLogEntryRepository.save(logEntry);
 
 		if (pet.getPetType() == PetType.CAT) {
-			log.info(String.format("The cat is successfully bought"));
+			log.info(String.format(CAT_SUCCESSFULLY_BOUGHT));
 			System.out.println("Meow, cat " + pet.getName() + " has owner " + user.getFirstName());
 		} else if (pet.getPetType() == PetType.DOG) {
-			log.info(String.format("The dog is successfully bought\""));
+			log.info(String.format(DOG_SUCCESSFULLY_BOUGHT));
 			System.out.println("Woof, dog " + pet.getName() + " has owner " + user.getFirstName());
 		}
 
-		log.info(String.format("Purchase successful"));
+		log.info(String.format(PURCHASE_SUCCESSFUL));
 		return pet;
 	}
 
@@ -181,7 +198,7 @@ public class PetServiceImpl implements PetService {
 						successfulPurchases++;
 						hasPet = true;
 					} catch (Exception e) {
-						log.error(String.format("User %s could not make a purchase: %s", user.getFirstName(), e.getMessage()));
+						log.error(String.format(USER_COULD_NOT_MAKE_PURCHASE, user.getFirstName(), e.getMessage()));
 						failedPurchases++;
 					}
 				}
@@ -196,7 +213,7 @@ public class PetServiceImpl implements PetService {
 
 	@Override
 	public PetDto readPetById(Long petId) {
-		log.info(String.format("Pet with id: %d is being fetched", petId));
+		log.info(String.format(PET_IS_BEING_FETCHED, petId));
 		Pet pet = petRepository.findById(petId).orElseThrow(PetNotFoundException::new);
 		return modelMapper.map(pet, PetDto.class);
 	}
@@ -204,7 +221,7 @@ public class PetServiceImpl implements PetService {
 	@Override
 	public List<Pet> createRandomPets(int count) {
 		if (count <= 0 || count > 20) {
-			throw new IllegalArgumentException("Count should be between 1 and 20");
+			throw new IllegalArgumentException(CONUT_RANGE_1_TO_20);
 		}
 
 		List<Pet> createdPets = new ArrayList<>();
@@ -222,10 +239,10 @@ public class PetServiceImpl implements PetService {
 	public List<BuyLogEntryDto> readBuyHistory() {
 		List<BuyLogEntry> buyLogEntries = buyLogEntryRepository.findAll();
 		if (buyLogEntries.isEmpty()) {
-			log.error(String.format("No buyLogEntries found"));
-			throw new NoBuyLogEntriesException("No buyLogEntries found");
+			log.error(String.format(NO_BUY_LOG_ENTRIES_FOUND));
+			throw new NoBuyLogEntriesException(NO_BUY_LOG_ENTRIES_FOUND);
 		}
-		log.info(String.format("Retriving all the buyLogEntries"));
+		log.info(String.format(RETRIVING_ALL_BUY_LOG_ENTRIES));
 		return buyLogEntries.stream()
 		            .map(buyLogEntrie -> modelMapper.map(buyLogEntrie, BuyLogEntryDto.class))
 		            .collect(Collectors.toList());

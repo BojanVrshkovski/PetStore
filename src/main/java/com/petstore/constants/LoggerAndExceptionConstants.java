@@ -18,7 +18,12 @@ public class LoggerAndExceptionConstants {
 	public static final String CONUT_RANGE_1_TO_20 = "Count should be between 1 and 20";
 	public static final String NO_BUY_LOG_ENTRIES_FOUND = "No BuyLogEntries found";
 	public static final String RETRIVING_ALL_BUY_LOG_ENTRIES = "Retriving all the buyLogEntries";
-
-
+	public static final String USER_IS_BEING_FETCHED = "User with id: %d is being fetched";
+	public static final String NO_USERS_FOUND = "No users found";
+	public static final String RETRIVING_ALL_USERS = "Retriving all the users";
+	public static final String USER_REQUEST_IS_NULL = "UserRequest is null";
+	public static final String USER_IS_SUCCESSFULLY_ADDED_DB = "User successfully added in database with email address: %s";
+	public static final String USER_ALREDY_EXISTS = "User with that email alredy exists";
+	public static final String CONUT_RANGE_1_TO_10 = "Count should be between 1 and 10";
 
 }

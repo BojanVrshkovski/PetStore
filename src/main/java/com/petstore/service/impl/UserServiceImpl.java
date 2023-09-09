@@ -19,6 +19,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import static com.petstore.constants.LoggerAndExceptionConstants.CONUT_RANGE_1_TO_10;
+import static com.petstore.constants.LoggerAndExceptionConstants.NO_USERS_FOUND;
+import static com.petstore.constants.LoggerAndExceptionConstants.RETRIVING_ALL_USERS;
+import static com.petstore.constants.LoggerAndExceptionConstants.USER_ALREDY_EXISTS;
+import static com.petstore.constants.LoggerAndExceptionConstants.USER_IS_BEING_FETCHED;
+import static com.petstore.constants.LoggerAndExceptionConstants.USER_IS_SUCCESSFULLY_ADDED_DB;
+import static com.petstore.constants.LoggerAndExceptionConstants.USER_REQUEST_IS_NULL;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -36,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDto readUserById(Long userId) {
-		log.info(String.format("User with id: %d is being fetched", userId));
+		log.info(String.format(USER_IS_BEING_FETCHED, userId));
 		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 		return modelMapper.map(user, UserDto.class);
 	}
@@ -45,10 +52,10 @@ public class UserServiceImpl implements UserService {
 	public List<UserDto> readAllUsers() {
 		List<User> users = userRepository.findAll();
 		if (users.isEmpty()) {
-			log.error(String.format("No users found"));
-			throw new NoUsersFoundException("No users found");
+			log.error(String.format(NO_USERS_FOUND));
+			throw new NoUsersFoundException(NO_USERS_FOUND);
 		}
-		log.info(String.format("Retriving all the users"));
+		log.info(String.format(RETRIVING_ALL_USERS));
 		return users.stream()
 		            .map(user -> modelMapper.map(user, UserDto.class))
 		            .collect(Collectors.toList());
@@ -57,17 +64,17 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User createUser(UserRequest userRequest) {
 		if (userRequest == null) {
-			throw new IllegalArgumentException("userRequest is null");
+			throw new IllegalArgumentException(USER_REQUEST_IS_NULL);
 		}
 		User user;
 		try {
 			user = modelMapper.map(userRequest, User.class);
 			user = userRepository.save(user);
 			log.info(
-				String.format("User successfully added in database with email address: %s", userRequest.getEmailAddress()));
+				String.format(USER_IS_SUCCESSFULLY_ADDED_DB, userRequest.getEmailAddress()));
 		} catch (DataIntegrityViolationException e) {
-			log.error(String.format("User with that email alredy exists"));
-			throw new UserAlreadyExistException("User with that email alredy exists");
+			log.error(String.format(USER_ALREDY_EXISTS));
+			throw new UserAlreadyExistException(USER_ALREDY_EXISTS);
 		}
 		return user;
 	}
@@ -75,7 +82,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<User> createRandomUsers(int count) {
 		if (count <= 0 || count > 10) {
-			throw new IllegalArgumentException("Count should be between 1 and 10");
+			throw new IllegalArgumentException(CONUT_RANGE_1_TO_10);
 		}
 
 		List<User> createdUsers = new ArrayList<>();

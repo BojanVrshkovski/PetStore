@@ -5,7 +5,7 @@ import com.petstore.entity.Pet;
 import com.petstore.entity.User;
 import com.petstore.entity.dto.BuyLogEntryDto;
 import com.petstore.entity.dto.PetDto;
-import com.petstore.entity.enums.PetType;
+import com.petstore.entity.dto.UserDto;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.exception.NoBuyLogEntriesException;
 import com.petstore.exception.NoPetsFoundException;
@@ -16,19 +16,23 @@ import com.petstore.exception.PetNotFoundException;
 import com.petstore.repository.BuyLogEntryRepository;
 import com.petstore.repository.PetRepository;
 import com.petstore.repository.UserRepository;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
+import static com.petstore.util.BuyLogEntryFactory.getDefaultBuyLogEntry;
+import static com.petstore.util.BuyLogEntryFactory.getDefaultBuyLogEntryDto;
+import static com.petstore.util.PetFactory.getDefaultPet;
+import static com.petstore.util.PetFactory.getDefaultPetDto;
+import static com.petstore.util.PetFactory.getDefaultPetRequest;
+import static com.petstore.util.UserFactory.getDefaultUser;
+import static com.petstore.util.UserFactory.getDefaultUserDto;
 import static org.mockito.Mockito.verify;
 import org.springframework.dao.DataIntegrityViolationException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -40,10 +44,25 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static com.petstore.util.PetConstants.PET_ID;
+import static com.petstore.util.PetConstants.OWNER;
+import static com.petstore.util.PetConstants.NAME;
+import static com.petstore.util.PetConstants.PET_TYPE;
+import static com.petstore.util.PetConstants.DESCRIPTION;
+import static com.petstore.util.PetConstants.DATE_OF_BIRTH;
+import static com.petstore.util.PetConstants.PRICE;
+import static com.petstore.util.PetConstants.RAITING;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PetServiceImplTest {
 
+	private PetRequest petRequest;
+	private Pet pet;
+	private PetDto petDto;
+	private UserDto userDto;
+	private BuyLogEntryDto buyLogEntryDto;
+	private BuyLogEntry buyLogEntry;
+	private User user;
 	@InjectMocks
 	private PetServiceImpl petService;
 	@Mock
@@ -56,68 +75,38 @@ public class PetServiceImplTest {
 	@Mock
 	private UserRepository userRepository;
 
-	@BeforeEach
-	public void init() {
-		MockitoAnnotations.initMocks(this);
+	@Before
+	public void setup() {
+		petRequest = getDefaultPetRequest();
+		pet = getDefaultPet();
+		petDto = getDefaultPetDto();
+		userDto = getDefaultUserDto();
+		user = getDefaultUser();
+		buyLogEntryDto = getDefaultBuyLogEntryDto();
+		buyLogEntry = getDefaultBuyLogEntry();
 	}
 
 	@Test
 	public void testCreatePetSuccess() {
-		PetRequest petRequest = new PetRequest();
-		petRequest.setOwner(1L);
-		petRequest.setName("Toffi");
-		petRequest.setPetType(PetType.CAT);
-		petRequest.setDescription("The best Cat");
-		petRequest.setDateOfBirth(LocalDate.of(2014, 02, 02));
-		petRequest.setPrice(new BigDecimal(200.12));
-		petRequest.setRating(5);
-
-		Pet petEntity = new Pet();
-		petEntity.setOwner(1L);
-		petEntity.setName("Toffi");
-		petEntity.setPetType(PetType.CAT);
-		petEntity.setDescription("The best Cat");
-		petEntity.setDateOfBirth(LocalDate.of(2014,02,02));
-		petEntity.setPrice(new BigDecimal(200.12));
-		petEntity.setRating(5);
-
-		when(modelMapper.map(petRequest, Pet.class)).thenReturn(petEntity);
-		when(petRepository.save(petEntity)).thenReturn(petEntity);
+		when(modelMapper.map(petRequest, Pet.class)).thenReturn(pet);
+		when(petRepository.save(pet)).thenReturn(pet);
 
 		Pet result = petService.createPet(petRequest);
 
 		assertNotNull(result);
-		assertEquals(1L, result.getOwner().longValue());
-		assertEquals("Toffi", result.getName());
-		assertEquals(PetType.CAT, result.getPetType());
-		assertEquals("The best Cat", result.getDescription());
-		assertEquals(LocalDate.of(2014,02,02), result.getDateOfBirth());
-		assertEquals(new BigDecimal(9), result.getPrice());
-		assertEquals(5, result.getRating());
+		assertEquals(OWNER, result.getOwner().longValue());
+		assertEquals(NAME, result.getName());
+		assertEquals(PET_TYPE, result.getPetType());
+		assertEquals(DESCRIPTION, result.getDescription());
+		assertEquals(DATE_OF_BIRTH, result.getDateOfBirth());
+		assertEquals(PRICE, new BigDecimal(200.00));
+		assertEquals(RAITING, result.getRating());
 	}
 
 	@Test
 	public void testCreatePetAlreadyExists() {
-		PetRequest petRequest = new PetRequest();
-		petRequest.setOwner(1L);
-		petRequest.setName("Toffi");
-		petRequest.setPetType(PetType.CAT);
-		petRequest.setDescription("The best Cat");
-		petRequest.setDateOfBirth(LocalDate.of(2014, 02, 02));
-		petRequest.setPrice(new BigDecimal(200.12));
-		petRequest.setRating(5);
-
-		Pet petEntity = new Pet();
-		petEntity.setOwner(1L);
-		petEntity.setName("Toffi");
-		petEntity.setPetType(PetType.CAT);
-		petEntity.setDescription("The best Cat");
-		petEntity.setDateOfBirth(LocalDate.of(2014,02,02));
-		petEntity.setPrice(new BigDecimal(200.12));
-		petEntity.setRating(5);
-
-		when(modelMapper.map(petRequest, Pet.class)).thenReturn(petEntity);
-		doThrow(DataIntegrityViolationException.class).when(petRepository).save(petEntity);
+		when(modelMapper.map(petRequest, Pet.class)).thenReturn(pet);
+		doThrow(DataIntegrityViolationException.class).when(petRepository).save(pet);
 
 		assertThrows(PetAlredyExistsException.class, () -> petService.createPet(petRequest));
 	}
@@ -129,18 +118,10 @@ public class PetServiceImplTest {
 
 	@Test
 	public void testReadAllUsersSuccess() {
-		Pet pet = new Pet(2L,1L,"Toffi",PetType.CAT,"The best cat",LocalDate.of(2018,02,02),new BigDecimal(123.22),5);
-
-		Pet pet1 = new Pet(3L,2L,"Buffi",PetType.DOG,"The best cat",LocalDate.of(2019,04,10),new BigDecimal(100.20),3);
-
-		List<Pet> mockPets = List.of(pet, pet1);
+		List<Pet> mockPets = List.of(pet, pet);
 		when(petRepository.findAll()).thenReturn(mockPets);
 
-		PetDto petDto = new PetDto(2L,1L,"Toffi",PetType.CAT,"The best cat",LocalDate.of(2018,02,02),new BigDecimal(123.22),5);
-
-		PetDto petDto1 = new PetDto(3L,2L,"Buffi",PetType.DOG,"The best cat",LocalDate.of(2019,04,10),new BigDecimal(100.20),3);
-
-		List<PetDto> expectedPetDtos = List.of(petDto, petDto1);
+		List<PetDto> expectedPetDtos = List.of(petDto, petDto);
 		when(modelMapper.map(any(Pet.class), eq(PetDto.class)))
 			.thenReturn(expectedPetDtos.get(0), expectedPetDtos.get(1));
 
@@ -160,102 +141,79 @@ public class PetServiceImplTest {
 
 	@Test
 	public void testBuyPetSuccess() {
-		Long userId = 1L;
-		Long petId = 2L;
-		User testUser = new User();
-		testUser.setBudget(new BigDecimal(1000));
-		Pet testPet = new Pet();
-		testPet.setPrice(new BigDecimal(500));
-		testPet.setOwner(null);
+		pet.setOwner(null);
 
-		when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
-		when(petRepository.findById(petId)).thenReturn(Optional.of(testPet));
+		when(userRepository.findById(OWNER)).thenReturn(Optional.of(user));
+		when(petRepository.findById(PET_ID)).thenReturn(Optional.of(pet));
 
-		Pet result = petService.buy(userId, petId);
-		testPet.setOwner(userId);
+		Pet result = petService.buy(OWNER, PET_ID);
+		pet.setOwner(OWNER);
 
 		assertNotNull(result);
+		assertEquals(OWNER, pet.getOwner());
 
-		assertEquals(new BigDecimal(500), testUser.getBudget());
-		assertEquals(userId, testPet.getOwner());
-
-		verify(userRepository, times(1)).save(testUser);
-		verify(petRepository, times(1)).save(testPet);
+		verify(userRepository, times(1)).save(user);
+		verify(petRepository, times(1)).save(pet);
 	}
 
 	@Test
 	public void testBuyPetPetNotFound() {
-		Long userId = 1L;
-		Long petId = 2L;
-		User testUser = new User();
-		when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
-		when(petRepository.findById(petId)).thenReturn(Optional.empty());
+		when(userRepository.findById(OWNER)).thenReturn(Optional.of(user));
+		when(petRepository.findById(PET_ID)).thenReturn(Optional.empty());
 
-		assertThrows(PetNotFoundException.class, () -> petService.buy(userId, petId));
+		assertThrows(PetNotFoundException.class, () -> petService.buy(OWNER, PET_ID));
 
-		verify(userRepository, times(1)).findById(userId);
+		verify(userRepository, times(1)).findById(OWNER);
 	}
 
 	@Test
 	public void testBuyPetAlreadyHasOwner() {
-		Long userId = 1L;
-		Long petId = 2L;
-		User testUser = new User();
-		Pet testPet = new Pet();
-		testPet.setOwner(3L);
+		when(userRepository.findById(OWNER)).thenReturn(Optional.of(user));
+		when(petRepository.findById(PET_ID)).thenReturn(Optional.of(pet));
 
-		when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
-		when(petRepository.findById(petId)).thenReturn(Optional.of(testPet));
+		assertThrows(PetAlredyHasOwnerException.class, () -> petService.buy(OWNER, PET_ID));
 
-		assertThrows(PetAlredyHasOwnerException.class, () -> petService.buy(userId, petId));
-
-		verify(userRepository, times(1)).findById(userId);
+		verify(userRepository, times(1)).findById(OWNER);
 	}
 
 	@Test
 	public void testBuyPetNotEnoughBudget() {
-		Long userId = 1L;
-		Long petId = 2L;
-		User testUser = new User();
-		testUser.setBudget(new BigDecimal(100));
-		Pet testPet = new Pet();
-		testPet.setPrice(new BigDecimal(500));
+		user.setBudget(new BigDecimal(10.00));
+		pet.setOwner(null);
 
-		when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
-		when(petRepository.findById(petId)).thenReturn(Optional.of(testPet));
+		when(userRepository.findById(OWNER)).thenReturn(Optional.of(user));
+		when(petRepository.findById(PET_ID)).thenReturn(Optional.of(pet));
 
-		assertThrows(NotEnoughBudgetException.class, () -> petService.buy(userId, petId));
+		assertThrows(NotEnoughBudgetException.class, () -> petService.buy(OWNER, PET_ID));
 
-		verify(petRepository, times(1)).findById(petId);
+		verify(petRepository, times(1)).findById(PET_ID);
 	}
 
 	@Test
 	public void testReadPetByIdSuccess() {
-		Long petId = 1L;
-		Pet expectedPet = new Pet(petId, 1L,"Toffi",PetType.CAT,"The best cat",LocalDate.of(2018,02,02),new BigDecimal(123.22),5);
+		Pet expectedPet = pet;
 
-		when(modelMapper.map(expectedPet, PetDto.class)).thenReturn(new PetDto(petId, 1L,"Toffi",PetType.CAT,"The best cat",LocalDate.of(2018,02,02),new BigDecimal(123.22),5));
+		when(modelMapper.map(expectedPet, PetDto.class)).thenReturn(petDto);
 
-		when(petRepository.findById(petId)).thenReturn(Optional.of(expectedPet));
+		when(petRepository.findById(PET_ID)).thenReturn(Optional.of(expectedPet));
 
-		PetDto result = petService.readPetById(petId);
+		PetDto result = petService.readPetById(PET_ID);
 
 		assertNotNull(result);
-		assertEquals(petId, result.getPetId());
-		assertEquals(1L, result.getOwner());
-		assertEquals("Toffi", result.getName());
-		assertEquals(PetType.CAT, result.getPetType());
-		assertEquals(LocalDate.of(2018,02,02), result.getDateOfBirth());
-		assertEquals(new BigDecimal(123.22), result.getPrice());
-		assertEquals(5, result.getRating());
+		assertEquals(PET_ID, result.getPetId());
+		assertEquals(OWNER, result.getOwner());
+		assertEquals(NAME, result.getName());
+		assertEquals(PET_TYPE, result.getPetType());
+		assertEquals(DATE_OF_BIRTH, result.getDateOfBirth());
+		assertEquals(PRICE, result.getPrice());
+		assertEquals(RAITING, result.getRating());
 	}
 
 	@Test
 	public void testGetUserByIdUserNotFound() {
-		Long petId = 999L;
-		when(petRepository.findById(petId)).thenReturn(Optional.empty());
+		when(petRepository.findById(PET_ID)).thenReturn(Optional.empty());
 
-		assertThrows(PetNotFoundException.class, () -> petService.readPetById(petId));
+		assertThrows(PetNotFoundException.class, () -> petService.readPetById(PET_ID));
 	}
 
 	@Test
@@ -286,16 +244,10 @@ public class PetServiceImplTest {
 
 	@Test
 	public void testReadAllBuyLogsSuccess() {
-		BuyLogEntry buyLogEntry1 = new BuyLogEntry(1L, LocalDateTime.now(), 2L, true);
-		BuyLogEntry buyLogEntry2 = new BuyLogEntry(2L, LocalDateTime.now(), 3L, false);
-
-		List<BuyLogEntry> mockBuyLogs = List.of(buyLogEntry1, buyLogEntry2);
+		List<BuyLogEntry> mockBuyLogs = List.of(buyLogEntry, buyLogEntry);
 		when(buyLogEntryRepository.findAll()).thenReturn(mockBuyLogs);
 
-		BuyLogEntryDto buyLogEntryDto1 = new BuyLogEntryDto(1L, LocalDateTime.now(), 2L, true);
-		BuyLogEntryDto buyLogEntryDto2 = new BuyLogEntryDto(2L, LocalDateTime.now(), 3L, false);
-
-		List<BuyLogEntryDto> expectedBuyLogEntryDtos = List.of(buyLogEntryDto1, buyLogEntryDto2);
+		List<BuyLogEntryDto> expectedBuyLogEntryDtos = List.of(buyLogEntryDto, buyLogEntryDto);
 		when(modelMapper.map(any(BuyLogEntry.class), eq(BuyLogEntryDto.class)))
 			.thenReturn(expectedBuyLogEntryDtos.get(0), expectedBuyLogEntryDtos.get(1));
 

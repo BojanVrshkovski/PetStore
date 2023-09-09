@@ -17,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.DataIntegrityViolationException;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,6 +31,7 @@ import static com.petstore.util.PetFactory.getDefaultPetDto;
 import static com.petstore.util.PetFactory.getDefaultPetRequest;
 import static com.petstore.util.UserFactory.getDefaultUserDto;
 import static com.petstore.util.PetFactory.createDummyPets;
+import static com.petstore.util.BuyLogEntryFactory.getDefaultBuyLogEntryDto;
 import static com.petstore.util.PetConstants.PET_ID;
 import static com.petstore.util.PetConstants.OWNER;
 import static com.petstore.util.PetConstants.NAME;
@@ -48,6 +48,7 @@ public class PetControllerTest {
 	private Pet pet;
 	private PetDto petDto;
 	private UserDto userDto;
+	private BuyLogEntryDto buyLogEntryDto;
 	@InjectMocks
 	private PetController petController;
 	@Mock
@@ -61,6 +62,7 @@ public class PetControllerTest {
 		pet = getDefaultPet();
 		petDto = getDefaultPetDto();
 		userDto = getDefaultUserDto();
+		buyLogEntryDto = getDefaultBuyLogEntryDto();
 	}
 	@Test
 	public void testCreatePetSuccess() {
@@ -184,8 +186,8 @@ public class PetControllerTest {
 	@Test
 	public void testReadAllBuyLogsSuccess(){
 		List<BuyLogEntryDto> expectedBuyLogs = Arrays.asList(
-			new BuyLogEntryDto(1L, LocalDateTime.now(),2L,true),
-			new BuyLogEntryDto(2L, LocalDateTime.now(),3L,false)
+			buyLogEntryDto,
+			buyLogEntryDto
 		);
 
 		when(petService.readBuyHistory()).thenReturn(expectedBuyLogs);

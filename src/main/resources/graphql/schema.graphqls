@@ -1,0 +1,83 @@
+type Query {
+    readAllUsers: [UserDto]
+    readUserById(id : ID!): User
+    readAllPets: [PetDto]
+    readPetById(petId: ID!): Pet
+    readBuyHistory: [BuyLogEntryDto]
+}
+
+type Mutation{
+    createUser(userRequest: UserInput): User
+    createPet(petRequest: PetInput): Pet
+    buy(userId: ID!, petId: ID!): Pet
+    buyAll: PurchaseSummary
+    createRandomUsers(count: Int!): [User]
+    createRandomPets(count: Int!): [Pet]
+}
+
+type PurchaseSummary {
+    successfulPurchases: Int
+    failedPurchases: Int
+}
+
+
+input UserInput{
+    firstName: String!
+    lastName: String!
+    emailAddress: String!
+    budget: Float!
+}
+
+input PetInput {
+    owner: Int
+    name: String!
+    petType: String!
+    description: String
+    dateOfBirth: String!
+    rating: Int
+}
+
+type User {
+    userId: ID!
+    firstName: String!
+    lastName: String!
+    emailAddress: String!
+    budget: Float!
+}
+
+type UserDto {
+    userId: ID!
+    firstName: String!
+    lastName: String!
+    emailAddress: String!
+    budget: Float!
+}
+
+type Pet {
+    petId: ID!
+    owner: User
+    name: String!
+    petType: String!
+    description: String
+    dateOfBirth: String!
+    price: Float!
+    rating: Int
+}
+
+type PetDto {
+    petId: ID!
+    owner: User
+    name: String!
+    petType: String!
+    description: String
+    dateOfBirth: String!
+    price: Float!
+    rating: Int
+}
+
+type BuyLogEntryDto {
+    id: ID!
+    executionDate: String!
+    userId: Int!
+    allowedToBuy: Boolean!
+}

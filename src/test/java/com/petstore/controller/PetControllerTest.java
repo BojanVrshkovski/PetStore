@@ -121,8 +121,6 @@ public class PetControllerTest {
 	@Test
 	public void testBuyPetSuccess() {
 		when(petService.buy(OWNER, PET_ID)).thenReturn(pet);
-		when(petService.readPetById(PET_ID)).thenReturn(petDto);
-		when(userService.readUserById(OWNER)).thenReturn(userDto);
 
 		Pet result = petController.buy(OWNER, PET_ID);
 

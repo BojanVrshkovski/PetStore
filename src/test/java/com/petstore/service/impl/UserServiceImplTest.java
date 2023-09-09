@@ -7,18 +7,16 @@ import com.petstore.exception.UserAlreadyExistException;
 import com.petstore.exception.UserNotFoundException;
 import com.petstore.exception.NoUsersFoundException;
 import com.petstore.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import static org.mockito.Mockito.doThrow;
-import java.math.BigDecimal;
 import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import java.util.Collections;
@@ -28,7 +26,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.eq;
 import static com.petstore.util.UserFactory.getDefaultUserRequest;
 import static com.petstore.util.UserFactory.getDefaultUser;
-import static com.petstore.util.UserFactory.createDummyUsers;
 import static com.petstore.util.UserFactory.getDefaultUserDto;
 import static com.petstore.util.UserConstants.USER_ID;
 import static com.petstore.util.UserConstants.EMAIL_ADDRESS;
@@ -38,6 +35,9 @@ import static com.petstore.util.UserConstants.BUDGET;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
+	private User user;
+	private UserRequest userRequest;
+	private UserDto userDto;
 
 	@InjectMocks
 	private UserServiceImpl userService;
@@ -47,39 +47,38 @@ public class UserServiceImplTest {
 	@Mock
 	private UserRepository userRepository;
 
-	@BeforeEach
-	public void init() {
-		MockitoAnnotations.initMocks(this);
+	@Before
+	public void setup() {
+		user = getDefaultUser();
+		userDto = getDefaultUserDto();
+		userRequest = getDefaultUserRequest();
 	}
 
 	@Test
 	public void testGetUserByIdSuccess() {
-		Long userId = 1L;
-		User expectedUser = new User(userId, "Bojan", "Vrshkovski", "bojan@gmail.com", new BigDecimal(200.2));
+		User expectedUser = user;
 
 		ModelMapper modelMapper = Mockito.mock(ModelMapper.class);
-		when(modelMapper.map(expectedUser, UserDto.class)).thenReturn(new UserDto(userId, "Bojan", "Vrshkovski", "bojan@gmail.com", new BigDecimal(200.2)));
+		when(modelMapper.map(expectedUser, UserDto.class)).thenReturn(userDto);
 
 		UserServiceImpl userService = new UserServiceImpl(userRepository, modelMapper);
-		when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+		when(userRepository.findById(USER_ID)).thenReturn(Optional.of(expectedUser));
 
-		UserDto result = userService.readUserById(userId);
+		UserDto result = userService.readUserById(USER_ID);
 
 		assertNotNull(result);
-		assertEquals(userId, result.getUserId());
-		assertEquals("Bojan", result.getFirstName());
-		assertEquals("Vrshkovski", result.getLastName());
-		assertEquals("bojan@gmail.com", result.getEmailAddress());
-		assertEquals(new BigDecimal(200.2), result.getBudget());
+		assertEquals(USER_ID, result.getUserId());
+		assertEquals(FIRST_NAME, result.getFirstName());
+		assertEquals(LAST_NAME, result.getLastName());
+		assertEquals(EMAIL_ADDRESS, result.getEmailAddress());
+		assertEquals(BUDGET, result.getBudget());
 	}
 
 	@Test
 	public void testGetUserByIdUserNotFound() {
+		when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
 
-		Long userId = 999L;
-		when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-		assertThrows(UserNotFoundException.class, () -> userService.readUserById(userId));
+		assertThrows(UserNotFoundException.class, () -> userService.readUserById(USER_ID));
 	}
 
 	@Test
@@ -91,26 +90,10 @@ public class UserServiceImplTest {
 
 	@Test
 	public void testReadAllUsersSuccess() {
-		User user1 = new User();
-		user1.setUserId(1L);
-		user1.setFirstName("user1");
-
-		User user2 = new User();
-		user2.setUserId(2L);
-		user2.setFirstName("user2");
-
-		List<User> mockUsers = List.of(user1, user2);
+		List<User> mockUsers = List.of(user, user);
 		when(userRepository.findAll()).thenReturn(mockUsers);
 
-		UserDto userDto1 = new UserDto();
-		userDto1.setUserId(1L);
-		userDto1.setFirstName("user1");
-
-		UserDto userDto2 = new UserDto();
-		userDto2.setUserId(2L);
-		userDto2.setFirstName("user2");
-
-		List<UserDto> expectedUserDtos = List.of(userDto1, userDto2);
+		List<UserDto> expectedUserDtos = List.of(userDto, userDto);
 		when(modelMapper.map(any(User.class), eq(UserDto.class)))
 			.thenReturn(expectedUserDtos.get(0), expectedUserDtos.get(1));
 
@@ -122,7 +105,6 @@ public class UserServiceImplTest {
 
 	@Test
 	public void testReadAllUsersEmptyList() {
-
 		when(userRepository.findAll()).thenReturn(Collections.emptyList());
 
 		assertThrows(NoUsersFoundException.class, () -> userService.readAllUsers());
@@ -130,39 +112,23 @@ public class UserServiceImplTest {
 
 	@Test
 	public void testCreateUserSuccess() {
-		UserRequest userRequest= new UserRequest( "Bojan", "Vrshkovski", "bojan@gmail.com", new BigDecimal("1000.0"));
-		User userEntity = new User();
-		userEntity.setUserId(1L);
-		userEntity.setFirstName("Bojan");
-		userEntity.setLastName("Vrshkovski");
-		userEntity.setEmailAddress("bojan@gmail.com");
-		userEntity.setBudget(new BigDecimal("1000.0"));
-
-		when(modelMapper.map(userRequest, User.class)).thenReturn(userEntity);
-		when(userRepository.save(userEntity)).thenReturn(userEntity);
+		when(modelMapper.map(userRequest, User.class)).thenReturn(user);
+		when(userRepository.save(user)).thenReturn(user);
 
 		User result = userService.createUser(userRequest);
 
 		assertNotNull(result);
-		assertEquals(1L, result.getUserId());
-		assertEquals("Bojan", result.getFirstName());
-		assertEquals("Vrshkovski", result.getLastName());
-		assertEquals("bojan@gmail.com", result.getEmailAddress());
-		assertEquals(new BigDecimal("1000.0"), result.getBudget());
+		assertEquals(USER_ID, result.getUserId());
+		assertEquals(FIRST_NAME, result.getFirstName());
+		assertEquals(LAST_NAME, result.getLastName());
+		assertEquals(EMAIL_ADDRESS, result.getEmailAddress());
+		assertEquals(BUDGET, result.getBudget());
 	}
 
 	@Test
 	public void testCreateUserAlreadyExists() {
-		UserRequest userRequest= new UserRequest( "Bojan", "Vrshkovski", "bojan@gmail.com", new BigDecimal("1000.0"));
-		User userEntity = new User();
-		userEntity.setUserId(1L);
-		userEntity.setFirstName("Bojan");
-		userEntity.setLastName("Vrshkovski");
-		userEntity.setEmailAddress("bojan@gmail.com");
-		userEntity.setBudget(new BigDecimal("1000.0"));
-
-		when(modelMapper.map(userRequest, User.class)).thenReturn(userEntity);
-		doThrow(DataIntegrityViolationException.class).when(userRepository).save(userEntity);
+		when(modelMapper.map(userRequest, User.class)).thenReturn(user);
+		doThrow(DataIntegrityViolationException.class).when(userRepository).save(user);
 
 		assertThrows(UserAlreadyExistException.class, () -> userService.createUser(userRequest));
 	}

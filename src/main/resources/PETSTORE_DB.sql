@@ -6,6 +6,25 @@ CREATE TABLE users (
     budget DECIMAL(10, 2) NOT NULL
 );
 
+CREATE TABLE pets (
+	pet_id SERIAL PRIMARY KEY,
+	owner_id INT REFERENCES users(user_id),
+	name VARCHAR(50) NOT NULL,
+    pet_type VARCHAR(10) NOT NULL,
+    description TEXT,
+    date_of_birth DATE NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    rating INT,
+    FOREIGN KEY (owner_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE buy_log_entries (
+    id SERIAL PRIMARY KEY,
+    execution_date TIMESTAMP,
+    user_id INT,
+    allowed_to_buy BOOLEAN
+);
+
 INSERT INTO users (first_name, last_name, email_address, budget)
 VALUES
     ('John', 'Doe', 'johndoe@example.com', 1000.00),
@@ -18,18 +37,6 @@ VALUES
     ('Olivia', 'Davis', 'olivia@example.com', 900.50),
     ('William', 'Martinez', 'william@example.com', 1300.25),
     ('Sophia', 'Anderson', 'sophia@example.com', 1100.75);
-
-CREATE TABLE pets (
-	pet_id SERIAL PRIMARY KEY,
-	owner_id INT REFERENCES users(user_id),
-	name VARCHAR(50) NOT NULL,
-    pet_type VARCHAR(10) NOT NULL,
-    description TEXT,
-    date_of_birth DATE NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    rating INT,
-    FOREIGN KEY (owner_id) REFERENCES users(user_id)
-);
 
 INSERT INTO pets (name, pet_type, description, date_of_birth, price, rating)
 VALUES ('Fluffy', 'CAT', 'A cute and playful kitten', '2020-05-15', 50.99, 4);
@@ -60,13 +67,6 @@ VALUES ('Tofz', 'CAT', 'Mysterious and independent toffii', '2019-03-08', 49.99,
 
 INSERT INTO pets (name, pet_type, description, date_of_birth, price, rating)
 VALUES ('Klara', 'DOG', 'Gentle and affectionate Golden Retriever klara', '2020-06-22', 80.50, 5);
-
-CREATE TABLE buy_log_entries (
-    id SERIAL PRIMARY KEY,
-    execution_date TIMESTAMP,
-    user_id INT,
-    allowed_to_buy BOOLEAN
-);
 
 
 SELECT * FROM pets

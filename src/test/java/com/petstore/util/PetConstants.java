@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 public class PetConstants {
 	public static final Long PET_ID = 1L;
-	public static final Long OWNER = 2L;
+	public static final Long OWNER = 1L;
 	public static final String NAME = "Toffi";
 	public static final PetType PET_TYPE = PetType.CAT;
 	public static final String DESCRIPTION = "The best cat";

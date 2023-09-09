@@ -1,27 +1,23 @@
 package com.petstore.controller;
 
 import com.petstore.entity.Pet;
-import com.petstore.entity.User;
 import com.petstore.entity.dto.BuyLogEntryDto;
 import com.petstore.entity.dto.PetDto;
 import com.petstore.entity.dto.UserDto;
-import com.petstore.entity.enums.PetType;
 import com.petstore.entity.request.PetRequest;
 import com.petstore.exception.NoBuyLogEntriesException;
 import com.petstore.exception.NoPetsFoundException;
 import com.petstore.exception.PetNotFoundException;
 import com.petstore.service.PetService;
 import com.petstore.service.UserService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.DataIntegrityViolationException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,9 +27,27 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static com.petstore.util.PetFactory.getDefaultPet;
+import static com.petstore.util.PetFactory.getDefaultPetDto;
+import static com.petstore.util.PetFactory.getDefaultPetRequest;
+import static com.petstore.util.UserFactory.getDefaultUserDto;
+import static com.petstore.util.PetFactory.createDummyPets;
+import static com.petstore.util.PetConstants.PET_ID;
+import static com.petstore.util.PetConstants.OWNER;
+import static com.petstore.util.PetConstants.NAME;
+import static com.petstore.util.PetConstants.PET_TYPE;
+import static com.petstore.util.PetConstants.DESCRIPTION;
+import static com.petstore.util.PetConstants.DATE_OF_BIRTH;
+import static com.petstore.util.PetConstants.PRICE;
+import static com.petstore.util.PetConstants.RAITING;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class PetControllerTest {
+	private PetRequest petRequest;
+	private Pet pet;
+	private PetDto petDto;
+	private UserDto userDto;
 	@InjectMocks
 	private PetController petController;
 	@Mock
@@ -41,51 +55,33 @@ public class PetControllerTest {
 	@Mock
 	private UserService userService;
 
+	@Before
+	public void setup(){
+		petRequest = getDefaultPetRequest();
+		pet = getDefaultPet();
+		petDto = getDefaultPetDto();
+		userDto = getDefaultUserDto();
+	}
 	@Test
 	public void testCreatePetSuccess() {
-		PetRequest petRequest = new PetRequest();
-		petRequest.setOwner(1L);
-		petRequest.setName("Toffi");
-		petRequest.setPetType(PetType.CAT);
-		petRequest.setDescription("The best Cat");
-		petRequest.setDateOfBirth(LocalDate.of(2014,02,02));
-		petRequest.setPrice(new BigDecimal(200.12));
-		petRequest.setRating(5);
-
-		Pet createdPet = new Pet();
-		createdPet.setOwner(1L);
-		createdPet.setName("Toffi");
-		createdPet.setPetType(PetType.CAT);
-		createdPet.setDescription("The best Cat");
-		createdPet.setDateOfBirth(LocalDate.of(2014,02,02));
-		createdPet.setPrice(new BigDecimal(200.12));
-		createdPet.setRating(5);
+		Pet createdPet = pet;
 
 		when(petService.createPet(petRequest)).thenReturn(createdPet);
 
 		Pet result = petController.createPet(petRequest);
 
 		assertNotNull(result);
-		assertEquals(1L, result.getOwner().longValue());
-		assertEquals("Toffi", result.getName());
-		assertEquals(PetType.CAT, result.getPetType());
-		assertEquals("The best Cat", result.getDescription());
-		assertEquals(LocalDate.of(2014,02,02), result.getDateOfBirth());
-		assertEquals(new BigDecimal(200.12), result.getPrice());
-		assertEquals(5, result.getRating());
+		assertEquals(OWNER, result.getOwner().longValue());
+		assertEquals(NAME, result.getName());
+		assertEquals(PET_TYPE, result.getPetType());
+		assertEquals(DESCRIPTION, result.getDescription());
+		assertEquals(DATE_OF_BIRTH, result.getDateOfBirth());
+		assertEquals(PRICE, result.getPrice());
+		assertEquals(RAITING, result.getRating());
 	}
 
 	@Test
 	public void testCreatePetFailure() {
-		PetRequest petRequest = new PetRequest();
-		petRequest.setOwner(1L);
-		petRequest.setName("Toffi");
-		petRequest.setPetType(PetType.CAT);
-		petRequest.setDescription("The best Cat");
-		petRequest.setDateOfBirth(LocalDate.of(2014,02,02));
-		petRequest.setPrice(new BigDecimal(200.12));
-		petRequest.setRating(5);
-
 		when(petService.createPet(petRequest)).thenThrow(new DataIntegrityViolationException("Pet alredy exists"));
 
 		try {
@@ -100,10 +96,9 @@ public class PetControllerTest {
 
 	@Test
 	public void testReadAllPetsSuccess() {
-
 		List<PetDto> expectedPets = Arrays.asList(
-			new PetDto(2L,1L,"Toffi",PetType.CAT,"The best cat",LocalDate.of(2018,02,02),new BigDecimal(123.22),5),
-			new PetDto(3L,2L,"Buffi",PetType.DOG,"The best cat",LocalDate.of(2019,04,10),new BigDecimal(100.20),3)
+			petDto,
+      petDto
 		);
 
 		when(petService.readAllPets()).thenReturn(expectedPets);
@@ -123,58 +118,40 @@ public class PetControllerTest {
 
 	@Test
 	public void testBuyPetSuccess() {
-		Long userId = 1L;
-		Long petId = 2L;
-		User testUser = new User();
-		testUser.setBudget(new BigDecimal(1000));
+		when(petService.buy(OWNER, PET_ID)).thenReturn(pet);
+		when(petService.readPetById(PET_ID)).thenReturn(petDto);
+		when(userService.readUserById(OWNER)).thenReturn(userDto);
 
-		UserDto testUserDto = new UserDto();
-		testUserDto.setBudget(new BigDecimal(1000));
-
-		Pet testPet = new Pet();
-		testPet.setPrice(new BigDecimal(500));
-		testPet.setOwner(null);
-
-		PetDto testPetDto = new PetDto();
-		testPetDto.setPrice(new BigDecimal(500));
-		testPetDto.setOwner(null);
-
-		when(petService.buy(userId, petId)).thenReturn(testPet);
-		when(petService.readPetById(petId)).thenReturn(testPetDto);
-		when(userService.readUserById(userId)).thenReturn(testUserDto);
-
-		Pet result = petController.buy(userId, petId);
+		Pet result = petController.buy(OWNER, PET_ID);
 
 		assertNotNull(result);
 
-		verify(petService, times(1)).buy(userId, petId);
+		verify(petService, times(1)).buy(OWNER, PET_ID);
 	}
 
+	@Test
 	public void testReadPetByIdSuccess() {
-		Long petId = 1L;
-		PetDto expectedPet = new PetDto(petId, 1L,"Toffi",PetType.CAT,"The best cat",LocalDate.of(2018,02,02),new BigDecimal(123.22),5);
+		PetDto expectedPet = petDto;
 
-		when(petService.readPetById(petId)).thenReturn(expectedPet);
+		when(petService.readPetById(PET_ID)).thenReturn(expectedPet);
 
-		PetDto result = petController.readPetById(petId);
+		PetDto result = petController.readPetById(PET_ID);
 
 		assertNotNull(result);
-		assertEquals(petId, result.getPetId());
-		assertEquals(1L, result.getOwner());
-		assertEquals("Toffi", result.getName());
-		assertEquals(PetType.CAT, result.getPetType());
-		assertEquals(LocalDate.of(2018,02,02), result.getDateOfBirth());
-		assertEquals(new BigDecimal(123.22), result.getPrice());
-		assertEquals(5, result.getRating());
+		assertEquals(PET_ID, result.getPetId());
+		assertEquals(OWNER, result.getOwner());
+		assertEquals(NAME , result.getName());
+		assertEquals(PET_TYPE, result.getPetType());
+		assertEquals(DATE_OF_BIRTH, result.getDateOfBirth());
+		assertEquals(PRICE, result.getPrice());
+		assertEquals(RAITING, result.getRating());
 	}
 
 	@Test
 	public void testReadPetByIdNotFound() {
-		Long petId = 2L;
+		when(petService.readPetById(PET_ID)).thenThrow(PetNotFoundException.class);
 
-		when(petService.readPetById(petId)).thenThrow(PetNotFoundException.class);
-
-		assertThrows(PetNotFoundException.class, () -> petController.readPetById(petId));
+		assertThrows(PetNotFoundException.class, () -> petController.readPetById(PET_ID));
 	}
 
 	@Test
@@ -224,23 +201,6 @@ public class PetControllerTest {
 		when(petService.readBuyHistory()).thenThrow(NoBuyLogEntriesException.class);
 
 		assertThrows(NoBuyLogEntriesException.class, () -> petController.readBuyHistory());
-	}
-
-	private List<Pet> createDummyPets(int count) {
-		List<Pet> pets = new ArrayList<>();
-		for (int i = 1; i <= count; i++) {
-			Pet pet = new Pet();
-			pet.setPetId((long) i);
-			pet.setOwner((long) i);
-			pet.setName("Toffi");
-			pet.setPetType(PetType.CAT);
-			pet.setDescription("The best cat");
-			pet.setPrice(new BigDecimal(100.00));
-			pet.setRating(10);
-
-			pets.add(pet);
-		}
-		return pets;
 	}
 
 }

@@ -1,6 +1,8 @@
 package com.petstore.util;
 
+import com.petstore.entity.Pet;
 import com.petstore.entity.dto.PetDto;
+import com.petstore.entity.request.PetRequest;
 
 import static com.petstore.util.PetConstants.PET_ID;
 import static com.petstore.util.PetConstants.OWNER;
@@ -17,5 +19,17 @@ public class PetFactory {
 		PetDto petDto = new PetDto(PET_ID, OWNER, NAME,PET_TYPE,DESCRIPTION,DATE_OF_BIRTH,PRICE,RAITING);
 
 		return petDto;
+	}
+
+	public static Pet getDefaultPet(){
+		Pet pet = new Pet(PET_ID, OWNER, NAME,PET_TYPE,DESCRIPTION,DATE_OF_BIRTH,PRICE,RAITING);
+
+		return pet;
+	}
+
+	public static PetRequest getDefaultPetRequest(){
+		PetRequest petRequest = new PetRequest(OWNER, NAME,PET_TYPE,DESCRIPTION,DATE_OF_BIRTH,PRICE,RAITING);
+
+		return petRequest;
 	}
 }

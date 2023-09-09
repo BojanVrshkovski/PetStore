@@ -7,17 +7,18 @@ Pet Store is a comprehensive Java Spring Boot application designed for managing 
 ### Pet Management
 
 - **Create Pets**: Users can add their beloved pets to the store. Pet details including name, type, description, date of birth, price, and rating can be specified.
-- **Browse Pets**: Explore a diverse catalog of pets available for adoption or purchase, categorized by type and other attributes.
-- **Pet Details**: View detailed information about each pet, including descriptions, specifications, pricing, and user ratings.
+- **Browse Pets**: Explore a diverse catalog of pets available for purchase, categorized by type and other attributes.
+- **Pet Details**: View detailed information about each pet, including descriptions, pricing, and user ratings.
 
-### Pet Adoption
+### Pet Purchase
 
 - **Purchase Pets**: Users can browse and purchase pets from the store. Purchased pets are transferred to the user's ownership.
 
 ### User Accounts
 
-- **User Registration**: Create a user account, enabling features like saving preferences, managing shipping addresses, and securely storing payment methods.
-- **Order History**: Track and manage your pet adoption and purchase history, including order status, invoices, and shipment tracking information.
+- **User Registration**: Create a user account, enabling features like saving preferences.
+- **Browse Users**: Explore all the users that are existing.
+- **Order History**: Track and manage your pet purchase history.
 
 ### GraphQL API
 

@@ -26,6 +26,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.eq;
+import static com.petstore.util.UserFactory.getDefaultUserRequest;
+import static com.petstore.util.UserFactory.getDefaultUser;
+import static com.petstore.util.UserFactory.createDummyUsers;
+import static com.petstore.util.UserFactory.getDefaultUserDto;
+import static com.petstore.util.UserConstants.USER_ID;
+import static com.petstore.util.UserConstants.EMAIL_ADDRESS;
+import static com.petstore.util.UserConstants.LAST_NAME;
+import static com.petstore.util.UserConstants.FIRST_NAME;
+import static com.petstore.util.UserConstants.BUDGET;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {

@@ -6,6 +6,7 @@ import com.petstore.entity.request.UserRequest;
 import com.petstore.exception.NoUsersFoundException;
 import com.petstore.exception.UserNotFoundException;
 import com.petstore.service.UserService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -14,53 +15,66 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.DataIntegrityViolationException;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static com.petstore.util.UserFactory.getDefaultUserRequest;
+import static com.petstore.util.UserFactory.getDefaultUser;
+import static com.petstore.util.UserFactory.createDummyUsers;
+import static com.petstore.util.UserFactory.getDefaultUserDto;
+import static com.petstore.util.UserConstants.USER_ID;
+import static com.petstore.util.UserConstants.EMAIL_ADDRESS;
+import static com.petstore.util.UserConstants.LAST_NAME;
+import static com.petstore.util.UserConstants.FIRST_NAME;
+import static com.petstore.util.UserConstants.BUDGET;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserControllerTest {
+	private User user;
+	private UserDto userDto;
+	private UserRequest userRequest;
 	@InjectMocks
 	private UserController userController;
 
 	@Mock
 	private UserService userService;
 
+	@Before
+	public void setup(){
+		user = getDefaultUser();
+		userDto = getDefaultUserDto();
+		userRequest = getDefaultUserRequest();
+	}
 	@Test
 	public void testGetUserByIdSuccess() {
-		Long userId = 1L;
-		UserDto expectedUser = new UserDto(userId, "Bojan", "Vrshkovski", "bojan@gmail.com", new BigDecimal(200.2));
+		UserDto expectedUser = userDto;
 
-		when(userService.readUserById(userId)).thenReturn(expectedUser);
+		when(userService.readUserById(USER_ID)).thenReturn(expectedUser);
 
-		UserDto result = userController.readUserById(userId);
+		UserDto result = userController.readUserById(USER_ID);
 
 		assertNotNull(result);
-		assertEquals(userId, result.getUserId());
-		assertEquals("Bojan", result.getFirstName());
-		assertEquals("Vrshkovski", result.getLastName());
-		assertEquals("bojan@gmail.com", result.getEmailAddress());
-		assertEquals(new BigDecimal(200.2), result.getBudget());
+		assertEquals(USER_ID, result.getUserId());
+		assertEquals(FIRST_NAME, result.getFirstName());
+		assertEquals(LAST_NAME, result.getLastName());
+		assertEquals(EMAIL_ADDRESS, result.getEmailAddress());
+		assertEquals(BUDGET, result.getBudget());
 	}
 
 	@Test
 	public void testGetUserByIdNotFound() {
-		Long userId = 2L;
+		when(userService.readUserById(USER_ID)).thenThrow(UserNotFoundException.class);
 
-		when(userService.readUserById(userId)).thenThrow(UserNotFoundException.class);
-
-		assertThrows(UserNotFoundException.class, () -> userController.readUserById(userId));
+		assertThrows(UserNotFoundException.class, () -> userController.readUserById(USER_ID));
 	}
 
 	@Test
 	public void testReadAllUsersSuccess() {
-
 		List<UserDto> expectedUsers = Arrays.asList(
-			new UserDto(2L,"Bojan","Vrshkovski","b@gmail.com",new BigDecimal(123.22)),
-			new UserDto(3L,"Petar","Vrshkovski","petar@gmail.com",new BigDecimal(12322.22))
+			userDto,
+			userDto
 		);
 
 		when(userService.readAllUsers()).thenReturn(expectedUsers);
@@ -80,39 +94,20 @@ public class UserControllerTest {
 
 	@Test
 	public void testCreateUserSuccess() {
-		UserRequest userRequest = new UserRequest();
-		userRequest.setFirstName("Bojan");
-		userRequest.setLastName("Vrshkovski");
-		userRequest.setEmailAddress("bojan@gmail.com");
-		userRequest.setBudget(new BigDecimal(100.0));
-
-		User createdUser = new User();
-		createdUser.setUserId(1L);
-		createdUser.setFirstName("Bojan");
-		createdUser.setLastName("Vrshkovski");
-		createdUser.setEmailAddress("bojan@gmail.com");
-		createdUser.setBudget(new BigDecimal(100.0));
-
-		when(userService.createUser(userRequest)).thenReturn(createdUser);
+		when(userService.createUser(userRequest)).thenReturn(user);
 
 		User result = userController.createUser(userRequest);
 
 		assertNotNull(result);
-		assertEquals(1L, result.getUserId().longValue());
-		assertEquals("Bojan", result.getFirstName());
-		assertEquals("Vrshkovski", result.getLastName());
-		assertEquals("bojan@gmail.com", result.getEmailAddress());
-		assertEquals(new BigDecimal(100.0), result.getBudget());
+		assertEquals(USER_ID, result.getUserId().longValue());
+		assertEquals(FIRST_NAME, result.getFirstName());
+		assertEquals(LAST_NAME, result.getLastName());
+		assertEquals(EMAIL_ADDRESS, result.getEmailAddress());
+		assertEquals(BUDGET, result.getBudget());
 	}
 
 	@Test
 	public void testCreateUserFailure() {
-		UserRequest userRequest = new UserRequest();
-		userRequest.setFirstName("Bojan");
-		userRequest.setLastName("Vrshkovski");
-		userRequest.setEmailAddress("bojan@gmail.com");
-		userRequest.setBudget(new BigDecimal(100.0));
-
 		when(userService.createUser(userRequest)).thenThrow(new DataIntegrityViolationException("User with that email already exists"));
 
 		try {
@@ -147,19 +142,5 @@ public class UserControllerTest {
 			assertEquals(expectedUser.getEmailAddress(), actualUser.getEmailAddress());
 			assertEquals(expectedUser.getBudget(), actualUser.getBudget());
 		}
-	}
-
-	private List<User> createDummyUsers(int count) {
-		List<User> users = new ArrayList<>();
-		for (int i = 1; i <= count; i++) {
-			User user = new User();
-			user.setUserId((long) i);
-			user.setFirstName("User" + i);
-			user.setLastName("LastName" + i);
-			user.setEmailAddress("user" + i + "@example.com");
-			user.setBudget(BigDecimal.valueOf(1000 + i * 100));
-			users.add(user);
-		}
-		return users;
 	}
 }
